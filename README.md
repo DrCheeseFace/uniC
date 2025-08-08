@@ -7,7 +7,7 @@
 3) all `#define` must be `SCREAMING_SNAKE_CASE`
 4) all `enum` values must be `SCREAMING_SNAKE_CASE` and must be prefixed with the type name \
    eg: `enum MyEnum` -> `MY_ENUM_DEFAULT`
-5) all function names are `snake_case` eg: `void my_function(void)`
+5) all function names must be `snake_case` eg: `void my_function(void)`
 6) for all source files with a prefix denoted with the first "_" 
     - the max prefix length is 5 character (prefer 1-3)
     - all `struct` `enum` `typedef` `define` `function` 's must be prefixed with the uppercase version of the prefix \
@@ -32,13 +32,13 @@
 | type             | example             |
 | ---------------- | ------------------- |
 | variables        | is_open             |
-| function         | G_my_function(void) |
-| struct           | G_MyGameState       |
-| typedef          | G_Points            |
-| enum             | G_MyEnum            |
-| enum value       | G_MY_ENUM_DEFAULT   |
-| union            | G_MyUnion           |
-| definition/macro | G_WINDOW_WIDTH      |
+| function         | T_my_function(void) |
+| struct           | T_MyGameState       |
+| typedef          | T_Points            |
+| enum             | T_MyEnum            |
+| enum value       | T_MY_ENUM_DEFAULT   |
+| union            | T_MyUnion           |
+| definition/macro | T_WINDOW_WIDTH      |
 
 
 ## Examples
