@@ -77,7 +77,7 @@ void TEST_ctx_append_case(struct TEST_Context *t_ctx,
 	t_ctx->case_count++;
 }
 
-void TEST_ctx_log(struct TEST_Context t_ctx)
+int TEST_ctx_log(struct TEST_Context t_ctx)
 {
 	TEST_logln("", TEST_SEVERITY_DEFAULT);
 
@@ -88,14 +88,19 @@ void TEST_ctx_log(struct TEST_Context t_ctx)
 		TEST_log(TEST_TAB, TEST_SEVERITY_DEFAULT);
 		TEST_case_log(t_ctx.cases[i]);
 	}
-
-	if (t_ctx.fail_count != 0) {
-		TEST_logln("FAILED", TEST_SEVERITY_ERROR);
-	} else {
-		TEST_logln("PASSED", TEST_SEVERITY_OK);
-	}
+	TEST_logln("", TEST_SEVERITY_DEFAULT);
 
 	char pass_rate[15];
 	sprintf(pass_rate, "%d/%d Passed", t_ctx.pass_count, t_ctx.case_count);
+	TEST_log(TEST_TAB, TEST_SEVERITY_DEFAULT);
 	TEST_logln(pass_rate, TEST_SEVERITY_DEFAULT);
+
+	TEST_log(TEST_TAB, TEST_SEVERITY_DEFAULT);
+	if (t_ctx.fail_count != 0) {
+		TEST_logln("FAILED", TEST_SEVERITY_ERROR);
+		return 1;
+	} else {
+		TEST_logln("PASSED", TEST_SEVERITY_OK);
+		return 0;
+	}
 }

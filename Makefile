@@ -36,7 +36,7 @@ MAIN_SRC = src/*.c
 
 TEST_SRC = test/*.c src/util.c src/util.h 
 
-.PHONY: all build run clean format format-check bear debug test
+.PHONY: all build run clean format format-check bear debug test check
 
 all: whodoyouthinkyouareiam
 
@@ -69,7 +69,7 @@ bear: # this is for creating the compile_commands.json file
 debug: 
 	$(CC) $(CFLAGS_DEBUG) -o $(MAIN_TARGET) $(MAIN_SRC) $(LINKS)
 
-check: format-check debug format
+check: format-check debug test
 
 test: build-test run-test
 

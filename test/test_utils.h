@@ -53,6 +53,9 @@ void TEST_ctx_destroy(struct TEST_Context *t_ctx);
 void TEST_ctx_append_case(struct TEST_Context *t_ctx,
 			  struct TEST_Case test_case);
 
-void TEST_ctx_log(struct TEST_Context t_ctx);
+/*
+ * returns 0 if passed 
+ */
+int TEST_ctx_log(struct TEST_Context t_ctx);
 
 #endif // !TEST_UTILS_H

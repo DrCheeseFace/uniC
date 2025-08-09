@@ -2,7 +2,7 @@
 #include "test_utils.h"
 #include <string.h>
 
-void test_get_file_prefix(void)
+int test_get_file_prefix(void)
 {
 	struct TEST_Context *t_ctx = TEST_ctx_create("test_get_file_prefix");
 
@@ -112,11 +112,12 @@ void test_get_file_prefix(void)
 							       len) };
 	TEST_ctx_append_case(t_ctx, test_case);
 
-	TEST_ctx_log(*t_ctx);
+	int failed = TEST_ctx_log(*t_ctx);
 	TEST_ctx_destroy(t_ctx);
+	return failed;
 }
 
 int main(void)
 {
-	test_get_file_prefix();
+	return test_get_file_prefix();
 }
