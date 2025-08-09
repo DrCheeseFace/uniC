@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-MRS_String *MRS_string_create(size_t capacity)
+MRS_String *MRS_create(size_t capacity)
 {
 	MRS_String *out = malloc(sizeof(*out));
 	out->value = malloc(sizeof(char) * capacity);
@@ -12,13 +12,23 @@ MRS_String *MRS_string_create(size_t capacity)
 	return out;
 }
 
-void MRS_string_free(MRS_String *string)
+MRS_String *MRS_init(size_t capacity, const char *value)
+{
+	MRS_String *out = MRS_create(capacity);
+	if (MRS_strncpy(out, value, strlen(value))) {
+		MRS_free(out);
+		return NULL;
+	}
+	return out;
+}
+
+void MRS_free(MRS_String *string)
 {
 	free(string->value);
 	free(string);
 }
 
-void MRS_string_filter(MRS_String *string, const char remove_me)
+void MRS_filter(MRS_String *string, const char remove_me)
 {
 	char filtered[string->len];
 	size_t filtered_len = 0;
@@ -29,10 +39,10 @@ void MRS_string_filter(MRS_String *string, const char remove_me)
 		}
 	}
 	string->len = filtered_len;
-	MRS_string_strncpy(string, filtered, filtered_len);
+	MRS_strncpy(string, filtered, filtered_len);
 }
 
-int MRS_string_strcpy(MRS_String *string, const char *src)
+int MRS_strcpy(MRS_String *string, const char *src)
 {
 	size_t len = strlen(src);
 	if (len > string->capacity) {
@@ -47,7 +57,7 @@ int MRS_string_strcpy(MRS_String *string, const char *src)
 	return 0;
 }
 
-int MRS_string_strncpy(MRS_String *string, const char *src, size_t len)
+int MRS_strncpy(MRS_String *string, const char *src, size_t len)
 {
 	if (len > string->capacity) {
 		return 1;
@@ -61,7 +71,7 @@ int MRS_string_strncpy(MRS_String *string, const char *src, size_t len)
 	return 0;
 }
 
-int MRS_string_strcmp(MRS_String *a, MRS_String *b)
+int MRS_strcmp(MRS_String *a, MRS_String *b)
 {
 	if (a->len != b->len) {
 		return 1;
@@ -74,4 +84,32 @@ int MRS_string_strcmp(MRS_String *a, MRS_String *b)
 	}
 
 	return 0;
+}
+
+char *MRS_strstr(MRS_String *haystack, MRS_String *needle,
+		 size_t *haystack_start_idx)
+{
+	size_t start_idx = 0;
+	if (haystack_start_idx != NULL) {
+		if (*haystack_start_idx > haystack->len) {
+			return NULL;
+		} else {
+			start_idx = *haystack_start_idx;
+		}
+	}
+
+	for (size_t i = start_idx; haystack->len; i++) {
+		for (size_t j = 0; needle->len; j++) {
+			if ((haystack->value[i + j] ^ needle->value[j]) != 0) {
+				break;
+			}
+			if (j == needle->len - 1) {
+				return &haystack->value[i];
+			}
+		}
+		if (i == haystack->len - needle->len) {
+			break;
+		}
+	}
+	return NULL;
 }

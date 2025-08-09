@@ -1,7 +1,6 @@
 #include "../src/f_file.h"
 #include "../src/mrs_strings.h"
 #include "mrt_test.h"
-#include <stdlib.h>
 #include <string.h>
 
 int test_get_file_prefix(void)
@@ -120,10 +119,32 @@ int test_get_file_prefix(void)
 
 int test_get_file_contents(void)
 {
-	char *file = F_get_file_contents("test/testdata/test1.h");
-	F_get_struct_names(file, strlen(file));
+	MRS_String *file = F_get_file_contents("test/testdata/test1.h");
 
-	free(file);
+	F_get_struct_names(file);
+
+	MRS_free(file);
+	return 0;
+}
+
+int test_temp(void)
+{
+	const char *haystack = "11151111111111111231";
+	const char *needle = "31";
+
+	MRS_String *a = MRS_create(strlen(haystack));
+	MRS_strcpy(a, haystack);
+
+	MRS_String *b = MRS_create(strlen(needle));
+	MRS_strcpy(b, needle);
+
+	size_t start_idx = 3;
+
+	char *x = MRS_strstr(a, b, &start_idx);
+	MRS_free(a);
+	MRS_free(b);
+	(void)x;
+
 	return 0;
 }
 
@@ -132,5 +153,6 @@ int main(void)
 	int err = 0;
 	err = err || test_get_file_prefix();
 	err = err || test_get_file_contents();
+	err = err || test_temp();
 	return err;
 }

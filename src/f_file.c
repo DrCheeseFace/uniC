@@ -41,63 +41,67 @@ int F_get_file_prefix(const char *file_name,
 	return file_prefix_len;
 }
 
-char *F_get_file_contents(const char *file_name)
+MRS_String *F_get_file_contents(const char *file_name)
 {
 	FILE *file = fopen(file_name, "rb");
 	fseek(file, 0, SEEK_END);
 	long file_size = ftell(file);
 	fseek(file, 0, SEEK_SET);
 
-	char *buffer = malloc(file_size + 1);
+	char buffer[file_size];
 	fread(buffer, 1, file_size, file);
-	buffer[file_size] = '\0';
 	fclose(file);
-	return buffer;
+
+	MRS_String *contents = MRS_create(file_size);
+	MRS_strncpy(contents, buffer, file_size);
+
+	return contents;
 }
 
-size_t F_get_next_keyword_idx(const char *file_contents, size_t start_position,
+size_t F_get_next_keyword_idx(MRS_String *file_contents, size_t start_position,
 			      F_CKeywords keyword)
 {
-	char *x = strstr(&file_contents[start_position],
-			 keywords_to_str[keyword]);
+	MRS_String *keyword_str = MRS_init(strlen(keywords_to_str[keyword]),
+					   keywords_to_str[keyword]);
 
-	return x - file_contents;
+	char *x = MRS_strstr(file_contents, keyword_str, &start_position);
+
+	MRS_free(keyword_str);
+	return x - file_contents->value;
 }
 
-MRS_String *F_get_struct_name(const char *file_contents,
+MRS_String *F_get_struct_name(MRS_String *file_contents,
 			      size_t struct_start_position)
 {
-	char *x = strstr(&file_contents[struct_start_position],
+	char *x = strstr(&file_contents->value[struct_start_position],
 			 tokens_to_str[F_CTOKENS_OPEN_CURLY]);
 
-	MRS_String *name = MRS_string_create(MAX_STRUCT_NAME_LENGTH);
-	const char *start_of_name = &file_contents[struct_start_position] +
-				    strlen(keywords_to_str[F_CKEYWORDS_STRUCT]);
+	MRS_String *name = MRS_create(MAX_STRUCT_NAME_LENGTH);
+	const char *start_of_name =
+		&file_contents->value[struct_start_position] +
+		strlen(keywords_to_str[F_CKEYWORDS_STRUCT]);
 
 	size_t name_length = x - start_of_name;
 
-	MRS_string_strncpy(name, start_of_name, name_length);
-	MRS_string_filter(name, ' ');
+	MRS_strncpy(name, start_of_name, name_length);
+	MRS_filter(name, ' ');
 	return name;
 }
 
 // TODO THARUN makesure to ONLY get structs in the top level
-void F_get_struct_names(char *file_contents, size_t file_contents_len)
+void F_get_struct_names(MRS_String *file_contents)
 {
 	size_t character_position = 0;
 	character_position = F_get_next_keyword_idx(
 		file_contents, character_position, F_CKEYWORDS_STRUCT);
 
 	MRS_String *name = F_get_struct_name(file_contents, character_position);
-	MRS_string_free(name);
+	MRS_free(name);
 	(void)name;
 
 	if (character_position == 0) { // not found?
 		return;
 	}
-
-	(void)file_contents;
-	(void)file_contents_len;
 }
 
 /*

@@ -10,25 +10,37 @@ typedef struct {
 	size_t capacity;
 } MRS_String;
 
-MRS_String *MRS_string_create(size_t capacity);
+MRS_String *MRS_create(size_t capacity);
 
-void MRS_string_free(MRS_String *string);
+/*
+ * /returns NULL if failed (double check capacity is enough)
+ */
+MRS_String *MRS_init(size_t capacity, const char *value);
+
+void MRS_free(MRS_String *string);
 
 /*
  * /returns 0 if successful
  */
-int MRS_string_strcpy(MRS_String *string, const char *src);
+int MRS_strcpy(MRS_String *string, const char *src);
 
 /*
  * /returns 0 if successful
  */
-int MRS_string_strncpy(MRS_String *string, const char *src, size_t len);
+int MRS_strncpy(MRS_String *string, const char *src, size_t len);
 
 /*
  * /returns 0 if successful
  */
-int MRS_string_strcmp(MRS_String *a, MRS_String *b);
+int MRS_strcmp(MRS_String *a, MRS_String *b);
 
-void MRS_string_filter(MRS_String *string, const char remove_me);
+/*
+ * If haystack_start_idx is NULL, defaults to 0
+ * /returns NULL if not found
+ */
+char *MRS_strstr(MRS_String *haystack, MRS_String *needle,
+		 size_t *haystack_start_idx);
+
+void MRS_filter(MRS_String *string, const char remove_me);
 
 #endif // !MRS_STRINGS_H

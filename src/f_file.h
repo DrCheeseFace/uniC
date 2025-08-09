@@ -2,6 +2,7 @@
 
 #define F_FILE_H
 
+#include "mrs_strings.h"
 #include <stddef.h>
 #define MAX_FILE_PREFIX_LENGTH 5
 #define FILE_PREFIX_DELIMITER '_'
@@ -34,8 +35,8 @@ int F_get_file_prefix(const char *src, char dest[MAX_FILE_PREFIX_LENGTH]);
  *
  * \ returns file contents in char array
  */
-char *F_get_file_contents(const char *file_name);
+MRS_String *F_get_file_contents(const char *file_name);
 
-void F_get_struct_names(char *file_contents, size_t file_contents_len);
+void F_get_struct_names(MRS_String *file_contents);
 
 #endif // !F_FILE_H
