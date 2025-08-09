@@ -1,4 +1,5 @@
 #include "../src/f_file.h"
+#include "../src/mrs_strings.h"
 #include "mrt_test.h"
 #include <stdlib.h>
 #include <string.h>

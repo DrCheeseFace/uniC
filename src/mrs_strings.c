@@ -32,6 +32,21 @@ void MRS_string_filter(MRS_String *string, const char remove_me)
 	MRS_string_strncpy(string, filtered, filtered_len);
 }
 
+int MRS_string_strcpy(MRS_String *string, const char *src)
+{
+	size_t len = strlen(src);
+	if (len > string->capacity) {
+		return 1;
+	}
+
+	for (size_t i = 0; i < len; i++) {
+		string->value[i] = src[i];
+	}
+	string->len = len;
+
+	return 0;
+}
+
 int MRS_string_strncpy(MRS_String *string, const char *src, size_t len)
 {
 	if (len > string->capacity) {
@@ -42,6 +57,21 @@ int MRS_string_strncpy(MRS_String *string, const char *src, size_t len)
 		string->value[i] = src[i];
 	}
 	string->len = len;
+
+	return 0;
+}
+
+int MRS_string_strcmp(MRS_String *a, MRS_String *b)
+{
+	if (a->len != b->len) {
+		return 1;
+	}
+
+	for (size_t i = 0; i < a->len; i++) {
+		if ((a->value[i] ^ b->value[i]) != 0) {
+			return 1;
+		}
+	}
 
 	return 0;
 }

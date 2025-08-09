@@ -80,6 +80,7 @@ MRS_String *F_get_struct_name(const char *file_contents,
 	MRS_string_filter(name, ' ');
 	return name;
 }
+
 // TODO THARUN makesure to ONLY get structs in the top level
 void F_get_struct_names(char *file_contents, size_t file_contents_len)
 {

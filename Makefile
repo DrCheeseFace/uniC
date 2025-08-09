@@ -22,7 +22,7 @@ CFLAGS_TEST = -Wall -Wextra -Werror -Wpointer-arith -Wcast-align \
 	 -Wswitch -Wundef -Wunused-but-set-parameter \
 	 -Wcast-qual  -Wfloat-equal -Wnested-externs \
 	 -O0 -std=c11 -g \
-	 # -fsanitize=address \
+	 -fsanitize=address \
 	 
 	 
 CFLAGS = -Wall -Wextra -Werror \
