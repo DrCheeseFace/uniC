@@ -1,5 +1,5 @@
 #include "f_file.h"
-#include "mrt_strings.h"
+#include "mrs_strings.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -64,20 +64,20 @@ size_t F_get_next_keyword_idx(const char *file_contents, size_t start_position,
 	return x - file_contents;
 }
 
-MRT_String *F_get_struct_name(const char *file_contents,
+MRS_String *F_get_struct_name(const char *file_contents,
 			      size_t struct_start_position)
 {
 	char *x = strstr(&file_contents[struct_start_position],
 			 tokens_to_str[F_CTOKENS_OPEN_CURLY]);
 
-	MRT_String *name = MRT_string_create(MAX_STRUCT_NAME_LENGTH);
+	MRS_String *name = MRS_string_create(MAX_STRUCT_NAME_LENGTH);
 	const char *start_of_name = &file_contents[struct_start_position] +
 				    strlen(keywords_to_str[F_CKEYWORDS_STRUCT]);
 
 	size_t name_length = x - start_of_name;
 
-	MRT_string_strncpy(name, start_of_name, name_length);
-	MRT_string_filter(name, ' ');
+	MRS_string_strncpy(name, start_of_name, name_length);
+	MRS_string_filter(name, ' ');
 	return name;
 }
 // TODO THARUN makesure to ONLY get structs in the top level
@@ -87,8 +87,8 @@ void F_get_struct_names(char *file_contents, size_t file_contents_len)
 	character_position = F_get_next_keyword_idx(
 		file_contents, character_position, F_CKEYWORDS_STRUCT);
 
-	MRT_String *name = F_get_struct_name(file_contents, character_position);
-	MRT_string_free(name);
+	MRS_String *name = F_get_struct_name(file_contents, character_position);
+	MRS_string_free(name);
 	(void)name;
 
 	if (character_position == 0) { // not found?

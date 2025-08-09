@@ -1,24 +1,24 @@
-#include "mrt_strings.h"
+#include "mrs_strings.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
-MRT_String *MRT_string_create(size_t capacity)
+MRS_String *MRS_string_create(size_t capacity)
 {
-	MRT_String *out = malloc(sizeof(*out));
+	MRS_String *out = malloc(sizeof(*out));
 	out->value = malloc(sizeof(char) * capacity);
 	out->capacity = capacity;
 	out->len = 0;
 	return out;
 }
 
-void MRT_string_free(MRT_String *string)
+void MRS_string_free(MRS_String *string)
 {
 	free(string->value);
 	free(string);
 }
 
-void MRT_string_filter(MRT_String *string, const char remove_me)
+void MRS_string_filter(MRS_String *string, const char remove_me)
 {
 	char filtered[string->len];
 	size_t filtered_len = 0;
@@ -29,10 +29,10 @@ void MRT_string_filter(MRT_String *string, const char remove_me)
 		}
 	}
 	string->len = filtered_len;
-	MRT_string_strncpy(string, filtered, filtered_len);
+	MRS_string_strncpy(string, filtered, filtered_len);
 }
 
-int MRT_string_strncpy(MRT_String *string, const char *src, size_t len)
+int MRS_string_strncpy(MRS_String *string, const char *src, size_t len)
 {
 	if (len > string->capacity) {
 		return 1;

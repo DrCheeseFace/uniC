@@ -35,7 +35,7 @@ TEST_TARGET = test.out
 
 MAIN_SRC = src/*.c
 
-TEST_SRC = test/*.c src/f_file.c src/mrt_strings.c
+TEST_SRC = test/*.c src/f_file.c src/mrs_strings.c
 
 .PHONY: all build run clean format format-check bear debug test check
 
