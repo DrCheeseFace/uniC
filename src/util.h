@@ -1,4 +1,3 @@
-
 #ifndef UTIL_H
 
 #define UTIL_H
@@ -7,9 +6,11 @@
 #define FILE_PREFIX_DELIMITER '_'
 
 /*
- * if prefix length found is larger than MAX_FILE_PREFIX_LENGTH, returns not found (0)
+ * \ if prefix length found is larger than MAX_FILE_PREFIX_LENGTH, returns not found (0)
+ * \ if prefix contains non-alpha returns not found
+ * \ if prefix contains uppercase returns not found
  *
- * /returns length of file prefix
+ * \ returns length of file prefix
  */
 int get_file_prefix(const char *src, char dest[MAX_FILE_PREFIX_LENGTH]);
 

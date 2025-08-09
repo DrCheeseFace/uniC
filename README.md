@@ -9,7 +9,8 @@
    eg: `enum MyEnum` -> `MY_ENUM_DEFAULT`
 5) all function names must be `snake_case` eg: `void my_function(void)`
 6) for all source files with a prefix denoted with the first "_" 
-    - the max prefix length is 5 character (prefer 1-3)
+    - the max prefix length is 5 characters (prefer 1-3) 
+    - the prefix must be lowercase alpha eg: `abc_object.h`
     - all `struct` `enum` `typedef` `define` `function` 's must be prefixed with the uppercase version of the prefix \
     eg: `s_this_state.h` -> `struct S_ThisState` `#define S_WINDOW_WIDTH` `S_calculate_this(int x)`
 
