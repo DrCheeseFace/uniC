@@ -76,26 +76,27 @@ void MRT_ctx_append_case(struct MRT_Context *t_ctx, struct MRT_Case test_case)
 	t_ctx->case_count++;
 }
 
-int MRT_ctx_log(struct MRT_Context t_ctx)
+int MRT_ctx_log(struct MRT_Context *t_ctx)
 {
 	MRT_logln("", MRT_SEVERITY_DEFAULT);
 
 	MRT_log("description: ", MRT_SEVERITY_DEFAULT);
-	MRT_logln(t_ctx.description, MRT_SEVERITY_INFO);
+	MRT_logln(t_ctx->description, MRT_SEVERITY_INFO);
 
-	for (int i = 0; i < t_ctx.case_count; i++) {
+	for (int i = 0; i < t_ctx->case_count; i++) {
 		MRT_log(MRT_TAB, MRT_SEVERITY_DEFAULT);
-		MRT_case_log(t_ctx.cases[i]);
+		MRT_case_log(t_ctx->cases[i]);
 	}
 	MRT_logln("", MRT_SEVERITY_DEFAULT);
 
 	char pass_rate[15];
-	sprintf(pass_rate, "%d/%d Passed", t_ctx.pass_count, t_ctx.case_count);
+	sprintf(pass_rate, "%d/%d Passed", t_ctx->pass_count,
+		t_ctx->case_count);
 	MRT_log(MRT_TAB, MRT_SEVERITY_DEFAULT);
 	MRT_logln(pass_rate, MRT_SEVERITY_DEFAULT);
 
 	MRT_log(MRT_TAB, MRT_SEVERITY_DEFAULT);
-	if (t_ctx.fail_count != 0) {
+	if (t_ctx->fail_count != 0) {
 		MRT_logln("FAILED", MRT_SEVERITY_ERROR);
 		return 1;
 	} else {

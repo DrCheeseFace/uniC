@@ -55,6 +55,6 @@ void MRT_ctx_append_case(struct MRT_Context *t_ctx, struct MRT_Case test_case);
 /*
  * returns 0 if passed 
  */
-int MRT_ctx_log(struct MRT_Context t_ctx);
+int MRT_ctx_log(struct MRT_Context *t_ctx);
 
 #endif // !MRT_TEST_H
