@@ -22,6 +22,7 @@ CFLAGS_TEST = -Wall -Wextra -Werror -Wpointer-arith -Wcast-align \
 	 -Wswitch -Wundef -Wunused-but-set-parameter \
 	 -Wcast-qual  -Wfloat-equal -Wnested-externs \
 	 -O0 -std=c11 -g \
+	 # -fsanitize=address \
 	 
 	 
 CFLAGS = -Wall -Wextra -Werror \
@@ -34,7 +35,7 @@ TEST_TARGET = test.out
 
 MAIN_SRC = src/*.c
 
-TEST_SRC = test/*.c src/util.c src/util.h 
+TEST_SRC = test/*.c src/f_file.c src/mrt_strings.c
 
 .PHONY: all build run clean format format-check bear debug test check
 

@@ -1,5 +1,6 @@
-#include "../src/util.h"
+#include "../src/f_file.h"
 #include "test_utils.h"
+#include <stdlib.h>
 #include <string.h>
 
 int test_get_file_prefix(void)
@@ -8,7 +9,7 @@ int test_get_file_prefix(void)
 
 	const char *example_file_name = "r_renderer.c";
 	char file_prefix[MAX_FILE_PREFIX_LENGTH] = "";
-	int len = get_file_prefix(example_file_name, file_prefix);
+	int len = F_get_file_prefix(example_file_name, file_prefix);
 	int expected_length = 1;
 	const char *expected_prefix = "r";
 
@@ -25,7 +26,7 @@ int test_get_file_prefix(void)
 
 	strncpy(file_prefix, " ", MAX_FILE_PREFIX_LENGTH);
 	example_file_name = "renderer.c";
-	len = get_file_prefix(example_file_name, file_prefix);
+	len = F_get_file_prefix(example_file_name, file_prefix);
 	expected_length = 0;
 	expected_prefix = "";
 
@@ -43,7 +44,7 @@ int test_get_file_prefix(void)
 
 	strncpy(file_prefix, " ", MAX_FILE_PREFIX_LENGTH);
 	example_file_name = "abcde_renderer.c";
-	len = get_file_prefix(example_file_name, file_prefix);
+	len = F_get_file_prefix(example_file_name, file_prefix);
 	expected_length = 5;
 	expected_prefix = "abcde";
 
@@ -61,7 +62,7 @@ int test_get_file_prefix(void)
 
 	strncpy(file_prefix, " ", MAX_FILE_PREFIX_LENGTH);
 	example_file_name = "abcdef_renderer.c";
-	len = get_file_prefix(example_file_name, file_prefix);
+	len = F_get_file_prefix(example_file_name, file_prefix);
 	expected_length = 0;
 	expected_prefix = "";
 
@@ -80,7 +81,7 @@ int test_get_file_prefix(void)
 	strncpy(file_prefix, " ", MAX_FILE_PREFIX_LENGTH);
 
 	example_file_name = "ac1d_renderer.c";
-	len = get_file_prefix(example_file_name, file_prefix);
+	len = F_get_file_prefix(example_file_name, file_prefix);
 	expected_length = 0;
 	expected_prefix = "";
 
@@ -97,7 +98,7 @@ int test_get_file_prefix(void)
 
 	strncpy(file_prefix, " ", MAX_FILE_PREFIX_LENGTH);
 	example_file_name = "1_renderer.c";
-	len = get_file_prefix(example_file_name, file_prefix);
+	len = F_get_file_prefix(example_file_name, file_prefix);
 	expected_length = 0;
 	expected_prefix = "";
 
@@ -117,7 +118,19 @@ int test_get_file_prefix(void)
 	return failed;
 }
 
+int test_get_file_contents(void)
+{
+	char *file = F_get_file_contents("test/testdata/test1.h");
+	F_get_struct_names(file, strlen(file));
+
+	free(file);
+	return 0;
+}
+
 int main(void)
 {
-	return test_get_file_prefix();
+	int err = 0;
+	err = err || test_get_file_prefix();
+	err = err || test_get_file_contents();
+	return err;
 }
