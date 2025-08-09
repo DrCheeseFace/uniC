@@ -160,9 +160,10 @@ int test_mrs_strings_strstr(void)
 	MRT_ctx_append_case(t_ctx, test_case);
 
 	MRS_strcpy(b, "52");
-	test_case =
-		(struct MRT_Case){ .description = "11151111111111111231 | 52",
-				   .pass = NULL == MRS_strstr(a, b, 0) };
+	test_case = (struct MRT_Case){
+		.description = "11151111111111111231 | 52",
+		.pass = MRT_ASSERT_NULL(MRS_strstr(a, b, 0))
+	};
 	MRT_ctx_append_case(t_ctx, test_case);
 
 	MRS_free(a);

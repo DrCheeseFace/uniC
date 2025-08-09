@@ -14,12 +14,15 @@
 
 #define MRT_TAB "    "
 
-// use me!
 #define MRT_ASSERT_EQ(expected, actual)                                        \
 	(MRT_assert_eq((&expected), (&actual), (sizeof(expected))))
 
 #define MRT_ASSERT(actual)                                                     \
 	(MRT_assert_eq(&(bool){ actual }, &(bool){ true }, sizeof(bool)))
+
+#define MRT_ASSERT_NULL(actual) (actual == NULL)
+
+#define MRT_ASSERT_NOT_NULL(actual) (actual != NULL)
 
 struct MRT_Case {
 	char description[MRT_MAX_CONTEXT_DESCRIPTION];

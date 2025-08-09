@@ -35,7 +35,8 @@ int MRS_strncpy(MRS_String *string, const char *src, size_t len);
 int MRS_strcmp(MRS_String *a, MRS_String *b);
 
 /*
- * If haystack_start_idx is NULL, defaults to 0
+ * /If haystack_start_idx is NULL, defaults to 0
+ *
  * /returns NULL if not found
  */
 char *MRS_strstr(MRS_String *haystack, MRS_String *needle,
