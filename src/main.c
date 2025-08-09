@@ -1,21 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#define MAX_FILE_PREFIX_LENGTH 5
+#include "util.h"
 
 int main(void)
 {
-	const char *file_name = "r_renderer.c";
-	char delimiter = '_';
-	char file_prefix[MAX_FILE_PREFIX_LENGTH] = "";
+	const char *example_file_name = "12345678_renderer.c";
 
-	char *file_prefix_delimiter = strchr(file_name, delimiter);
-	if (file_prefix_delimiter != NULL) {
-		size_t prefix_len = file_prefix_delimiter - file_name;
-		strncpy(file_prefix, file_name, prefix_len);
-		file_prefix[prefix_len] = '\0';
-	}
+	char file_prefix[MAX_FILE_PREFIX_LENGTH] = "";
+	int len = get_file_prefix(example_file_name, file_prefix);
+
+	(void)len;
 
 	return 0;
 }
