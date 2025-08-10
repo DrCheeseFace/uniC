@@ -1,4 +1,4 @@
-name: make check
+name: Build and Check
 
 on:
   push:
@@ -8,11 +8,14 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Run check
-      run: make check
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Run Check Command
+        run: make check
 
