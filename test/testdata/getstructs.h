@@ -1,3 +1,4 @@
+// DO NOT REFORMAT THIS FILE
 
 struct MyStruct { /* ... */
 };
@@ -5,7 +6,10 @@ typedef struct { /* ... */
 } MyTypedefStruct;
 
 struct mystruct {
-} mystruct;
+} mystructtypedefname;
+
+typedef struct{ // no gap
+} nogapstruct;
 
 typedef struct AnotherStruct { /* ... */
 } AnotherTypedefStruct;

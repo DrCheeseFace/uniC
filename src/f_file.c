@@ -57,6 +57,37 @@ MRS_String *F_get_file_contents(const char *file_name)
 	return contents;
 }
 
+// returns 0 if valid surroundings
+int F_keyword_validate_surrounding(MRS_String *file_contents,
+				   char *struct_start_position,
+				   F_CKeywords keyword)
+{
+	// check character immediatly after struct for no-whitespace no-{
+	int after_idx = struct_start_position - file_contents->value +
+			strlen(keywords_to_str[keyword]);
+	if (MRS_is_whitespace(file_contents, after_idx) != 0 &&
+	    MRS_get_char(file_contents, after_idx) !=
+		    *tokens_to_str[F_CTOKENS_OPEN_CURLY]) {
+		return 1;
+	}
+
+	// check character immediatly before struct for no-whitespace no-} no-;
+	if (struct_start_position != file_contents->value) {
+		size_t before_idx = 0;
+		MRS_get_idx(file_contents, struct_start_position - 1,
+			    &before_idx);
+
+		if (MRS_is_whitespace(file_contents, before_idx) != 0 &&
+		    MRS_get_char(file_contents, before_idx) !=
+			    *tokens_to_str[F_CTOKENS_CLOSE_CURLY] &&
+		    MRS_get_char(file_contents, before_idx) !=
+			    *tokens_to_str[F_CTOKENS_SEMI_COLON]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
 // returns 0 if found
 int F_get_next_keyword_idx(MRS_String *file_contents, size_t start_position,
 			   F_CKeywords keyword, size_t *found_position)
@@ -72,32 +103,12 @@ int F_get_next_keyword_idx(MRS_String *file_contents, size_t start_position,
 			return -1;
 		}
 
-		if (MRS_is_whitespace(
-			    file_contents,
-			    x - file_contents->value +
-				    strlen(keywords_to_str[keyword])) != 0) {
-			start_position = x - file_contents->value +
-					 strlen(keywords_to_str[keyword]);
+		if (F_keyword_validate_surrounding(file_contents, x, keyword) !=
+		    0) {
+			start_position += strlen(keywords_to_str[keyword]);
 			continue;
 		}
 
-		if (x != file_contents->value) {
-			if (MRS_is_whitespace(file_contents,
-					      x - file_contents->value - 1) !=
-			    0) {
-				int found = MRS_get_idx(
-					file_contents,
-					x + strlen(keywords_to_str[keyword]),
-					&start_position);
-				if (found == -1) {
-					MRS_free(keyword_str);
-					return -1;
-				}
-				start_position +=
-					strlen(keywords_to_str[keyword]);
-				continue;
-			}
-		}
 		MRS_free(keyword_str);
 		int found = MRS_get_idx(file_contents, x, found_position);
 		if (found == -1) {
