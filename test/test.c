@@ -286,13 +286,64 @@ int test_mrs_strings_strcat(void)
 	return failed;
 }
 
-int test_get_(void)
+int test_mrs_strings_get_char(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_get_file_contents");
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_mrs_strings_strcat");
+
+	MRS_String *src = MRS_init(10, "0123456789");
+
+	char actual = MRS_get_char(src, 3);
+	char expected = '3';
+	struct MRT_Case test_case =
+		(struct MRT_Case){ .description = "within bounds fully",
+				   .pass = MRT_ASSERT_EQ(expected, actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	actual = MRS_get_char(src, 0);
+	expected = '0';
+	test_case =
+		(struct MRT_Case){ .description = "zeroth idx",
+				   .pass = MRT_ASSERT_EQ(expected, actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	actual = MRS_get_char(src, 9);
+	expected = '9';
+	test_case =
+		(struct MRT_Case){ .description = "last idx",
+				   .pass = MRT_ASSERT_EQ(expected, actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	actual = MRS_get_char(src, 10);
+	expected = '\0';
+	test_case =
+		(struct MRT_Case){ .description = "outof bounds",
+				   .pass = MRT_ASSERT_EQ(expected, actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_free(src);
+
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
+int test_get_structs(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_get_structs");
 
 	MRS_String *file_contents =
-		F_get_file_contents("./test/testdata/test1.c");
-	F_get_structs(file_contents);
+		F_get_file_contents("test/testdata/getstructs.h");
+
+	MRS_String *struct_names[MAX_STRUCT_NAME_COUNT];
+	size_t struct_names_len;
+
+	F_get_structs(file_contents, struct_names, &struct_names_len);
+
+	MRS_free(file_contents);
+
+	for (size_t i = 0; i < struct_names_len; i++) {
+		MRS_free(struct_names[i]);
+	}
 
 	int failed = MRT_ctx_log(t_ctx);
 	MRT_ctx_free(t_ctx);
@@ -307,5 +358,7 @@ int main(void)
 	err = err || test_mrs_strings_strstr();
 	err = err || test_mrs_strings_filter();
 	err = err || test_mrs_strings_strcat();
+	err = err || test_mrs_strings_get_char();
+	err = err || test_get_structs();
 	return err;
 }

@@ -7,6 +7,7 @@
 #define MAX_FILE_PREFIX_LENGTH 5
 #define FILE_PREFIX_DELIMITER '_'
 #define MAX_STRUCT_NAME_LENGTH 30
+#define MAX_STRUCT_NAME_COUNT 50
 
 typedef enum {
 	F_CKEYWORDS_TYPEDEF,
@@ -18,6 +19,10 @@ typedef enum {
 typedef enum {
 	F_CTOKENS_OPEN_CURLY,
 	F_CTOKENS_CLOSE_CURLY,
+	F_CTOKENS_SEMI_COLON,
+	F_CTOKENS_NEWLINE,
+	F_CTOKENS_TAB,
+	F_CTOKENS_SPACE,
 	F_CTOKENS_COUNT,
 } F_CTokens;
 
@@ -37,6 +42,8 @@ int F_get_file_prefix(const char *src, char dest[MAX_FILE_PREFIX_LENGTH]);
  */
 MRS_String *F_get_file_contents(const char *file_name);
 
-void F_get_structs(MRS_String *file_contents);
+void F_get_structs(MRS_String *file_contents,
+		   MRS_String *struct_names[MAX_STRUCT_NAME_COUNT],
+		   size_t *struct_names_len);
 
 #endif // !F_FILE_H

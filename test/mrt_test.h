@@ -9,8 +9,8 @@
 #define MRT_GREEN_COLOR_CODE "\x1b[32m"
 #define MRT_RED_COLOR_CODE "\x1b[31m"
 
-#define MRT_MAX_TEST_CASES_PER_CONTEXT 100
-#define MRT_MAX_CONTEXT_DESCRIPTION 100
+#define MRT_MAX_TEST_CASES_PER_CONTEXT 64
+#define MRT_MAX_CONTEXT_DESCRIPTION 64
 
 #define MRT_TAB "    "
 
@@ -54,7 +54,7 @@ void MRT_ctx_free(struct MRT_Context *t_ctx);
 void MRT_ctx_append_case(struct MRT_Context *t_ctx, struct MRT_Case test_case);
 
 /*
- * returns 0 if passed 
+ * `returns` 0 if passed 
  */
 int MRT_ctx_log(struct MRT_Context *t_ctx);
 
