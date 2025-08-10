@@ -33,9 +33,8 @@ LINKS =
 MAIN_TARGET = main.out
 TEST_TARGET = test.out
 
-MAIN_SRC = src/*.c
-
-TEST_SRC = test/*.c src/f_file.c src/mrs_strings.c
+MAIN_SRC = $(wildcard src/*.c)
+TEST_SRC = $(filter-out src/main.c, $(wildcard src/*.c)) $(filter-out test/testdata/%, $(wildcard test/*.c))
 
 .PHONY: all build run clean format format-check bear debug test check
 
@@ -58,14 +57,17 @@ run-test:
 clean:
 	-rm -f $(MAIN_TARGET)
 
-format: 
-	find ./src ./test -name '*.h' -o -iname '*.c' | xargs clang-format -i --verbose
+format:
+	find ./src ./test -not -path './test/testdata/*' \( -name '*.h' -o -iname '*.c' \) | xargs clang-format -i --verbose
 
 format-check:
-	find ./src ./test -name '*.h' -o -iname '*.c' | xargs clang-format --dry-run --Werror
+	find ./src ./test -not -path './test/testdata/*' \( -name '*.h' -o -iname '*.c' \) | xargs clang-format --dry-run --Werror --verbose
 
-bear: # this is for creating the compile_commands.json file
+bear-debug: # this is for creating the compile_commands.json file
 	rm -f compile_commands.json && bear -- make build
+
+bear-test: # this is for creating the compile_commands.json file
+	rm -f compile_commands.json && bear -- make build-test
 
 debug: 
 	$(CC) $(CFLAGS_DEBUG) -o $(MAIN_TARGET) $(MAIN_SRC) $(LINKS)
