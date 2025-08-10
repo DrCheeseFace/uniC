@@ -2,7 +2,7 @@
 
 #define F_FILE_H
 
-#include "mrs_strings.h"
+#include "../lib/mr_utils/mrs_strings.h"
 #include <stddef.h>
 #define MAX_FILE_PREFIX_LENGTH 5
 #define FILE_PREFIX_DELIMITER '_'

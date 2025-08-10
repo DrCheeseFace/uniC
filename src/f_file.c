@@ -1,5 +1,5 @@
 #include "f_file.h"
-#include "mrs_strings.h"
+#include "../lib/mr_utils/mrs_strings.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -92,12 +92,11 @@ int F_keyword_validate_surrounding(MRS_String *file_contents,
 int F_get_next_keyword_idx(MRS_String *file_contents, size_t start_position,
 			   F_CKeywords keyword, size_t *found_position)
 {
-	MRS_String *keyword_str = MRS_init(strlen(keywords_to_str[keyword]),
-					   keywords_to_str[keyword]);
+	MRS_String *keyword_str = MRS_init(0, keywords_to_str[keyword]);
 
 	while (start_position < file_contents->len) {
 		char *x =
-			MRS_strstr(file_contents, keyword_str, &start_position);
+			MRS_strstr(file_contents, keyword_str, start_position);
 		if (x == NULL) {
 			MRS_free(keyword_str);
 			return -1;
@@ -125,11 +124,10 @@ MRS_String *F_get_struct_name(MRS_String *file_contents,
 			      size_t struct_start_position)
 {
 	MRS_String *open_curly =
-		MRS_init(strlen(tokens_to_str[F_CTOKENS_OPEN_CURLY]),
-			 tokens_to_str[F_CTOKENS_OPEN_CURLY]);
+		MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY]);
 
 	char *next_open_curly_position =
-		MRS_strstr(file_contents, open_curly, &struct_start_position);
+		MRS_strstr(file_contents, open_curly, struct_start_position);
 
 	MRS_String *name = MRS_create(MAX_STRUCT_NAME_LENGTH);
 	const char *start_of_name =
