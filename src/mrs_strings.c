@@ -127,3 +127,40 @@ char *MRS_strstr(MRS_String *haystack, MRS_String *needle,
 	}
 	return NULL;
 }
+
+char MRS_get_char(MRS_String *src, size_t idx)
+{
+	if (idx >= src->len) {
+		return '\0';
+	} else {
+		return src->value[idx];
+	}
+}
+
+int MRS_get_idx(MRS_String *src, char *idx, size_t *found_position)
+{
+	if (idx < src->value || idx >= &src->value[src->len]) {
+		return -1;
+	}
+	*found_position = (int)(idx - src->value);
+	return 0;
+}
+
+int MRS_is_whitespace(MRS_String *src, size_t idx)
+{
+	char c = MRS_get_char(src, idx);
+	if (c == '\0') {
+		return -1;
+	}
+	if (c == '\n' || c == '\t' || c == ' ') {
+		return 0;
+	}
+	return 1;
+}
+
+void MRS_remove_whitespace(MRS_String *src)
+{
+	MRS_filter(src, ' ');
+	MRS_filter(src, '\n');
+	MRS_filter(src, '\t');
+}
