@@ -1,8 +1,6 @@
 #include "../lib/mr_utils/mrs_strings.h"
 #include "../lib/mr_utils/mrt_test.h"
 #include "../src/f_file.h"
-#include <stdio.h>
-#include <string.h>
 
 int test_get_file_prefix(void)
 {

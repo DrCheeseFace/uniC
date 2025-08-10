@@ -1,12 +1,14 @@
 #ifndef F_FILE_H
-
 #define F_FILE_H
 
 #include "../lib/mr_utils/mrs_strings.h"
-#include <stddef.h>
+
 #define MAX_FILE_PREFIX_LENGTH 5
+
 #define FILE_PREFIX_DELIMITER '_'
+
 #define MAX_STRUCT_NAME_LENGTH 30
+
 #define MAX_STRUCT_NAME_COUNT 50
 
 typedef enum {
@@ -27,18 +29,18 @@ typedef enum {
 } F_CTokens;
 
 /*
- * \ if prefix length found is larger than MAX_FILE_PREFIX_LENGTH, returns not found (0)
- * \ if prefix contains non-alpha returns not found
- * \ if prefix contains uppercase returns not found
+ * `returns` 0 if prefix length found is larger than `MAX_FILE_PREFIX_LENGTH`
+ * `returns` 0 if prefix contains `non-alpha`
+ * `returns` 0 if prefix contains `uppercase`
  *
- * \ returns length of file prefix
+ * `returns` length of file prefix
  */
 int F_get_file_prefix(const char *src, char dest[MAX_FILE_PREFIX_LENGTH]);
 
 /*
- * \ dont forget to call free on the returned value
+ * dont forget to call free on the returned value
  *
- * \ returns file contents in char array
+ * `returns` file contents as `MRS_String`
  */
 MRS_String *F_get_file_contents(const char *file_name);
 

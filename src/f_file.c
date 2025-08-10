@@ -1,9 +1,6 @@
 #include "f_file.h"
-#include "../lib/mr_utils/mrs_strings.h"
 #include <ctype.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 const char *keywords_to_str[F_CKEYWORDS_COUNT] = {
 	"typedef",
