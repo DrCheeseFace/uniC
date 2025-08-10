@@ -1,6 +1,7 @@
 #ifndef MRS_STRINGS_H
 #define MRS_STRINGS_H
 #include <stddef.h>
+#include <string.h>
 
 #define MRS_MAX_STRING_LENGTH 100
 
@@ -33,6 +34,11 @@ int MRS_strncpy(MRS_String *string, const char *src, size_t len);
  * /returns 0 if successful
  */
 int MRS_strcmp(MRS_String *a, MRS_String *b);
+
+/*
+ * /returns 0 if successful
+ */
+int MRS_strcat(MRS_String *dest, MRS_String *src);
 
 /*
  * /If haystack_start_idx is NULL, defaults to 0

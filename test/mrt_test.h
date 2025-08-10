@@ -33,8 +33,6 @@ struct MRT_Context {
 	char description[MRT_MAX_CONTEXT_DESCRIPTION];
 	int pass_count;
 	int fail_count;
-	char *failed_test_descriptions[MRT_MAX_TEST_CASES_PER_CONTEXT];
-
 	struct MRT_Case cases[MRT_MAX_TEST_CASES_PER_CONTEXT];
 	int case_count;
 };
@@ -51,7 +49,7 @@ bool MRT_assert_eq(void *expected, void *actual, size_t size_of);
 
 struct MRT_Context *MRT_ctx_create(const char *description);
 
-void MRT_ctx_destroy(struct MRT_Context *t_ctx);
+void MRT_ctx_free(struct MRT_Context *t_ctx);
 
 void MRT_ctx_append_case(struct MRT_Context *t_ctx, struct MRT_Case test_case);
 

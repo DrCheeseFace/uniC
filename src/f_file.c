@@ -88,8 +88,16 @@ MRS_String *F_get_struct_name(MRS_String *file_contents,
 	return name;
 }
 
+size_t *F_seek_to_next_outer_level_position(MRS_String *file_contents,
+					    size_t current_position)
+{
+	(void)file_contents;
+	(void)current_position;
+	return 0;
+}
+
 // TODO THARUN makesure to ONLY get structs in the top level
-void F_get_struct_names(MRS_String *file_contents)
+void F_get_structs(MRS_String *file_contents)
 {
 	size_t character_position = 0;
 	character_position = F_get_next_keyword_idx(

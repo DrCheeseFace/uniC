@@ -114,18 +114,31 @@ int test_get_file_prefix(void)
 	MRT_ctx_append_case(t_ctx, test_case);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_destroy(t_ctx);
+	MRT_ctx_free(t_ctx);
 	return failed;
 }
 
 int test_get_file_contents(void)
 {
-	MRS_String *file = F_get_file_contents("test/testdata/test1.h");
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_get_file_contents");
 
-	F_get_struct_names(file);
+	MRS_String *actual =
+		F_get_file_contents("test/testdata/getfilecontent.c");
 
-	MRS_free(file);
-	return 0;
+	const char *expected_str = "int main(void)\n{\n\treturn 0;\n}\n";
+	MRS_String *expected = MRS_init(strlen(expected_str), expected_str);
+
+	struct MRT_Case test_case =
+		(struct MRT_Case){ .description = "getfilecontents basic",
+				   .pass = !MRS_strcmp(expected, actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_free(actual);
+	MRS_free(expected);
+
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
 }
 
 int test_mrs_strings_strstr(void)
@@ -170,7 +183,7 @@ int test_mrs_strings_strstr(void)
 	MRS_free(b);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_destroy(t_ctx);
+	MRT_ctx_free(t_ctx);
 	return failed;
 }
 
@@ -205,7 +218,84 @@ int test_mrs_strings_filter(void)
 	MRS_free(expected);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_destroy(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
+int test_mrs_strings_strcat(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_mrs_strings_strcat");
+
+	MRS_String *actual = MRS_init(10, "aaabbb");
+	MRS_String *append = MRS_init(10, "cc");
+	MRS_String *expected = MRS_init(10, "aaabbbcc");
+	MRS_strcat(actual, append);
+
+	struct MRT_Case test_case =
+		(struct MRT_Case){ .description = "aaabbb | cc",
+				   .pass = !MRS_strcmp(expected, actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_strcpy(actual, "123456789");
+	MRS_strcpy(append, "10");
+	test_case =
+		(struct MRT_Case){ .description =
+					   "123456789 | 10 over capacity",
+				   .pass = 0 == !MRS_strcat(actual, append) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_strcpy(actual, "123456789");
+	MRS_strcpy(append, "0");
+	MRS_strcpy(expected, "1234567890");
+	MRS_strcat(actual, append);
+	test_case = (struct MRT_Case){ .description =
+					       "123456789 | 1 exactly capacity",
+				       .pass = !MRS_strcmp(expected, actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_strcpy(actual, "123456789");
+	MRS_strcpy(append, "");
+	MRS_strcpy(expected, "123456789");
+	MRS_strcat(actual, append);
+	test_case = (struct MRT_Case){ .description = "123456789 | empty src",
+				       .pass = !MRS_strcmp(expected, actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_strcpy(actual, "");
+	MRS_strcpy(append, "123");
+	MRS_strcpy(expected, "123");
+	MRS_strcat(actual, append);
+	test_case = (struct MRT_Case){ .description = "123456789 | empty dest",
+				       .pass = !MRS_strcmp(expected, actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_strcpy(actual, "");
+	MRS_strcpy(append, "");
+	MRS_strcpy(expected, "");
+	MRS_strcat(actual, append);
+	test_case = (struct MRT_Case){ .description = "empty dest and src",
+				       .pass = !MRS_strcmp(expected, actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_free(actual);
+	MRS_free(expected);
+	MRS_free(append);
+
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
+int test_get_(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_get_file_contents");
+
+	MRS_String *file_contents =
+		F_get_file_contents("./test/testdata/test1.c");
+	F_get_structs(file_contents);
+
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
 	return failed;
 }
 
@@ -216,5 +306,6 @@ int main(void)
 	err = err || test_get_file_contents();
 	err = err || test_mrs_strings_strstr();
 	err = err || test_mrs_strings_filter();
+	err = err || test_mrs_strings_strcat();
 	return err;
 }

@@ -37,6 +37,6 @@ int F_get_file_prefix(const char *src, char dest[MAX_FILE_PREFIX_LENGTH]);
  */
 MRS_String *F_get_file_contents(const char *file_name);
 
-void F_get_struct_names(MRS_String *file_contents);
+void F_get_structs(MRS_String *file_contents);
 
 #endif // !F_FILE_H

@@ -59,7 +59,7 @@ struct MRT_Context *MRT_ctx_create(const char *description)
 	return t_ctx;
 }
 
-void MRT_ctx_destroy(struct MRT_Context *t_ctx)
+void MRT_ctx_free(struct MRT_Context *t_ctx)
 {
 	free(t_ctx);
 }

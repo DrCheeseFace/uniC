@@ -86,6 +86,20 @@ int MRS_strcmp(MRS_String *a, MRS_String *b)
 	return 0;
 }
 
+int MRS_strcat(MRS_String *dest, MRS_String *src)
+{
+	if (src->len + dest->len > dest->capacity) {
+		return 1;
+	}
+
+	for (size_t i = 0; i < src->len; i++) {
+		dest->value[dest->len] = src->value[i];
+		dest->len++;
+	}
+
+	return 0;
+}
+
 char *MRS_strstr(MRS_String *haystack, MRS_String *needle,
 		 size_t *haystack_start_idx)
 {
