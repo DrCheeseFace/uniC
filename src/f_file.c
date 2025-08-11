@@ -227,7 +227,6 @@ void F_seek_to_end_of_struct(MRS_String *file_contents,
 	}
 }
 
-// TODO THARUN makesure to ONLY get structs in the top level
 void F_get_structs(MRS_String *file_contents,
 		   MRS_String *struct_names[MAX_STRUCT_NAME_COUNT],
 		   size_t *struct_names_len)
@@ -252,28 +251,13 @@ void F_get_structs(MRS_String *file_contents,
 			*struct_names_len += 1;
 		}
 
-		MRS_String *typedef_name =
-			F_get_struct_typedef_name(file_contents,
-						  character_position); // TODO
+		MRS_String *typedef_name = F_get_struct_typedef_name(
+			file_contents, character_position);
 		if (typedef_name != NULL) {
 			struct_names[*struct_names_len] = typedef_name;
 			*struct_names_len += 1;
 		}
-		F_seek_to_end_of_struct(file_contents,
-					&character_position); // TODO
+		F_seek_to_end_of_struct(file_contents, &character_position);
 	}
 	return;
 }
-
-/*
-* struct MyStruct {};
-* typedef struct {
-* } MyTypedefStruct;
-* 
-* typedef struct AnotherStruct {
-* } AnotherTypedefStruct;
-* 
-* enum MyEnum { VALUE0 };
-* typedef enum { VALUE1 } MyTypedefEnum;
-* typedef enum AnotherEnum { VALUE2 } AnotherTypedefEnum;
-*/
