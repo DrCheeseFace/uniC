@@ -11,7 +11,7 @@ CFLAGS_DEBUG = -Wall -Wextra -Werror -Wpointer-arith -Wcast-align \
          -Wredundant-decls -Wsequence-point -Wshadow \
 	 -Wswitch -Wundef -Wunused-but-set-parameter \
 	 -Wcast-qual  -Wfloat-equal -Wnested-externs \
-	 -O0 -std=$(CSTANDARD) -g \ 
+	 -O0 -std=$(CSTANDARD) -g \
 	 -fsanitize=address \
 
 CFLAGS_TEST = -Wall -Wextra -Werror -Wpointer-arith -Wcast-align \
