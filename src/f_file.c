@@ -50,7 +50,7 @@ MRS_String *F_get_file_contents(const char *file_name)
 	fclose(file);
 
 	MRS_String *contents = MRS_create(file_size);
-	MRS_strncpy(contents, buffer, file_size);
+	MRS_setstrn(contents, buffer, file_size);
 
 	return contents;
 }
@@ -134,7 +134,7 @@ MRS_String *F_get_struct_name(MRS_String *file_contents,
 
 	size_t name_length = next_open_curly_position - start_of_name;
 
-	MRS_strncpy(name, start_of_name, name_length);
+	MRS_setstrn(name, start_of_name, name_length);
 	MRS_remove_whitespace(name);
 	MRS_free(open_curly);
 

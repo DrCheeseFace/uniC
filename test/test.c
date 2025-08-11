@@ -16,7 +16,7 @@ int test_get_file_prefix(void)
 	MRT_ctx_append_case(t_ctx, test_case);
 	MRS_free(file_prefix);
 
-	MRS_strcpy(example_file_name, "renderer.c");
+	MRS_setstr(example_file_name, "renderer.c");
 	file_prefix = F_get_file_prefix(example_file_name);
 	test_case = (struct MRT_Case){
 		.description = "renderer.c string",
@@ -25,29 +25,29 @@ int test_get_file_prefix(void)
 	};
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_strcpy(example_file_name, "abcde_renderer.c");
+	MRS_setstr(example_file_name, "abcde_renderer.c");
 	file_prefix = F_get_file_prefix(example_file_name);
-	MRS_strcpy(expected_prefix, "abcde");
+	MRS_setstr(expected_prefix, "abcde");
 	test_case = (struct MRT_Case){ .description = "abcde_renderer.c string",
 				       .pass = !MRS_strcmp(expected_prefix,
 							   file_prefix) };
 	MRT_ctx_append_case(t_ctx, test_case);
 	MRS_free(file_prefix);
 
-	MRS_strcpy(example_file_name, "abcdef_renderer.c");
+	MRS_setstr(example_file_name, "abcdef_renderer.c");
 	file_prefix = F_get_file_prefix(example_file_name);
 	test_case =
 		(struct MRT_Case){ .description = "abcdef_renderer.c string",
 				   .pass = file_prefix == NULL };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_strcpy(example_file_name, "ac1d_renderer.c");
+	MRS_setstr(example_file_name, "ac1d_renderer.c");
 	file_prefix = F_get_file_prefix(example_file_name);
 	test_case = (struct MRT_Case){ .description = "ac1d_renderer.c string",
 				       .pass = file_prefix == NULL };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_strcpy(example_file_name, "1_renderer.c");
+	MRS_setstr(example_file_name, "1_renderer.c");
 	file_prefix = F_get_file_prefix(example_file_name);
 	test_case = (struct MRT_Case){ .description = "1_renderer.c string",
 				       .pass = file_prefix == NULL };
