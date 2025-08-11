@@ -107,11 +107,7 @@ int F_get_next_keyword_idx(MRS_String *file_contents, size_t start_position,
 		}
 
 		MRS_free(keyword_str);
-		int found = MRS_get_idx(file_contents, x, found_position);
-		if (found == -1) {
-			return -1;
-		}
-		return 0;
+		return MRS_get_idx(file_contents, x, found_position);
 	}
 
 	MRS_free(keyword_str);
@@ -148,18 +144,87 @@ MRS_String *F_get_struct_name(MRS_String *file_contents,
 MRS_String *F_get_struct_typedef_name(MRS_String *file_contents,
 				      size_t struct_start_position)
 {
-	(void)file_contents;
-	(void)struct_start_position;
-	MRS_String *name = MRS_init(MAX_STRUCT_NAME_LENGTH, "TODO");
+	MRS_String *open_curly =
+		MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY]);
+
+	MRS_String *semi_colon =
+		MRS_init(0, tokens_to_str[F_CTOKENS_SEMI_COLON]);
+
+	char *struct_open_curly_ptr =
+		MRS_strstr(file_contents, open_curly, struct_start_position);
+
+	size_t search_position =
+		struct_open_curly_ptr - file_contents->value + 1;
+
+	int bracket_stack = 1;
+	size_t struct_end_bracket_position = 0;
+	for (size_t i = search_position; i < file_contents->len; i++) {
+		char current_char = MRS_get_char(file_contents, i);
+		if (current_char == *tokens_to_str[F_CTOKENS_OPEN_CURLY]) {
+			bracket_stack++;
+		} else if (current_char ==
+			   *tokens_to_str[F_CTOKENS_CLOSE_CURLY]) {
+			bracket_stack--;
+			if (bracket_stack == 0) {
+				struct_end_bracket_position = i;
+				break;
+			}
+		}
+	}
+	char *struct_semi_colon_ptr = MRS_strstr(file_contents, semi_colon,
+						 struct_end_bracket_position);
+
+	size_t struct_semi_colon_position = 0;
+	MRS_get_idx(file_contents, struct_semi_colon_ptr,
+		    &struct_semi_colon_position);
+	size_t typedef_name_len =
+		struct_semi_colon_position - struct_end_bracket_position - 1;
+
+	MRS_String *name = MRS_create(MAX_STRUCT_NAME_LENGTH);
+
+	MRS_setstrn(name,
+		    &file_contents->value[struct_end_bracket_position + 1],
+		    typedef_name_len);
+	MRS_remove_whitespace(name);
+
+	MRS_free(semi_colon);
+	MRS_free(open_curly);
+
+	if (name->len == 0) {
+		MRS_free(name);
+		return NULL;
+	}
+
 	return name;
 }
 
-size_t *F_seek_to_next_outer_level_position(MRS_String *file_contents,
-					    size_t current_position)
+void F_seek_to_end_of_struct(MRS_String *file_contents,
+			     size_t *current_position)
 {
-	(void)file_contents;
-	(void)current_position;
-	return 0;
+	MRS_String *open_curly =
+		MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY]);
+
+	char *struct_open_curly_ptr =
+		MRS_strstr(file_contents, open_curly, *current_position);
+	MRS_free(open_curly);
+
+	size_t open_curly_position = 0;
+	MRS_get_idx(file_contents, struct_open_curly_ptr, &open_curly_position);
+	size_t bracket_stack = 1;
+
+	for (size_t i = open_curly_position + 1; i < file_contents->len; i++) {
+		char current_char = MRS_get_char(file_contents, i);
+		if (current_char == *tokens_to_str[F_CTOKENS_OPEN_CURLY]) {
+			bracket_stack++;
+		} else if (current_char ==
+			   *tokens_to_str[F_CTOKENS_CLOSE_CURLY]) {
+			bracket_stack--;
+			if (bracket_stack == 0) {
+				*current_position = i;
+				return;
+			}
+		}
+	}
 }
 
 // TODO THARUN makesure to ONLY get structs in the top level
@@ -177,26 +242,25 @@ void F_get_structs(MRS_String *file_contents,
 						   F_CKEYWORDS_STRUCT,
 						   &character_position);
 		if (found == -1) {
-			//TODO do smthin herre
 			return;
 		}
 
 		MRS_String *name =
 			F_get_struct_name(file_contents, character_position);
-
-		character_position++;
-
-		/*F_get_struct_typedef_name(file_contents,*/
-		/*			  character_position); // TODO*/
-
-		/*F_forward_to_next_outer_level() // TODO*/
-
-		if (name == NULL) {
-			continue;
+		if (name != NULL) {
+			struct_names[*struct_names_len] = name;
+			*struct_names_len += 1;
 		}
 
-		struct_names[*struct_names_len] = name;
-		*struct_names_len += 1;
+		MRS_String *typedef_name =
+			F_get_struct_typedef_name(file_contents,
+						  character_position); // TODO
+		if (typedef_name != NULL) {
+			struct_names[*struct_names_len] = typedef_name;
+			*struct_names_len += 1;
+		}
+		F_seek_to_end_of_struct(file_contents,
+					&character_position); // TODO
 	}
 	return;
 }
