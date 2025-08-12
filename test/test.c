@@ -9,11 +9,12 @@ int test_get_file_prefix(void)
 	struct MRT_Context *t_ctx = MRT_ctx_create("test_get_file_prefix");
 
 	MRS_String example_file_name;
-	MRS_init(64, "r_renderer.c", &example_file_name);
+	MRS_init(64, "r_renderer.c", strlen("r_renderer.c"),
+		 &example_file_name);
 	MRS_String file_prefix;
 	int actual_result = F_get_file_prefix(&example_file_name, &file_prefix);
 	MRS_String expected_prefix;
-	MRS_init(64, "r", &expected_prefix);
+	MRS_init(64, "r", strlen("r"), &expected_prefix);
 
 	struct MRT_Case test_case = { .description = "r_renderer.c string",
 				      .pass = !MRS_strcmp(&expected_prefix,
@@ -21,7 +22,7 @@ int test_get_file_prefix(void)
 	MRT_ctx_append_case(t_ctx, test_case);
 	MRS_free(&file_prefix);
 
-	MRS_setstr(&example_file_name, "renderer.c");
+	MRS_setstr(&example_file_name, "renderer.c", strlen("renderer.c"));
 	actual_result = F_get_file_prefix(&example_file_name, &file_prefix);
 	test_case = (struct MRT_Case){
 		.description = "renderer.c string",
@@ -30,29 +31,32 @@ int test_get_file_prefix(void)
 	};
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&example_file_name, "abcde_renderer.c");
+	MRS_setstr(&example_file_name, "abcde_renderer.c",
+		   strlen("abcde_renderer.c"));
 	actual_result = F_get_file_prefix(&example_file_name, &file_prefix);
-	MRS_setstr(&expected_prefix, "abcde");
+	MRS_setstr(&expected_prefix, "abcde", strlen("abcde"));
 	test_case = (struct MRT_Case){ .description = "abcde_renderer.c string",
 				       .pass = !MRS_strcmp(&expected_prefix,
 							   &file_prefix) };
 	MRT_ctx_append_case(t_ctx, test_case);
 	MRS_free(&file_prefix);
 
-	MRS_setstr(&example_file_name, "abcdef_renderer.c");
+	MRS_setstr(&example_file_name, "abcdef_renderer.c",
+		   strlen("abcdef_renderer.c"));
 	actual_result = F_get_file_prefix(&example_file_name, &file_prefix);
 	test_case =
 		(struct MRT_Case){ .description = "abcdef_renderer.c string",
 				   .pass = actual_result == -1 };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&example_file_name, "ac1d_renderer.c");
+	MRS_setstr(&example_file_name, "ac1d_renderer.c",
+		   strlen("ac1d_renderer.c"));
 	actual_result = F_get_file_prefix(&example_file_name, &file_prefix);
 	test_case = (struct MRT_Case){ .description = "ac1d_renderer.c string",
 				       .pass = actual_result == -1 };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&example_file_name, "1_renderer.c");
+	MRS_setstr(&example_file_name, "1_renderer.c", strlen("1_renderer.c"));
 	actual_result = F_get_file_prefix(&example_file_name, &file_prefix);
 	test_case = (struct MRT_Case){ .description = "1_renderer.c string",
 				       .pass = actual_result == -1 };
@@ -75,7 +79,7 @@ int test_get_file_contents(void)
 
 	const char *expected_str = "int main(void)\n{\n\treturn 0;\n}\n";
 	MRS_String expected;
-	MRS_init(0, expected_str, &expected);
+	MRS_init(0, expected_str, strlen(expected_str), &expected);
 
 	struct MRT_Case test_case =
 		(struct MRT_Case){ .description = "getfilecontents basic",
@@ -130,7 +134,8 @@ int test_get_structs(void)
 	MRT_ctx_append_case(t_ctx, test_case);
 
 	for (size_t i = 0; i < struct_names_len; i++) {
-		MRS_setstr(expected_struct_name, expected_struct_names[i]);
+		MRS_setstr(expected_struct_name, expected_struct_names[i],
+			   strlen(expected_struct_names[i]));
 		snprintf(test_case.description, sizeof(test_case.description),
 			 "checking for expected struct %s",
 			 expected_struct_names[i]);
