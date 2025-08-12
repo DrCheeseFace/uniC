@@ -1,6 +1,7 @@
 #include "f_file.h"
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 const char *keywords_to_str[F_CKEYWORDS_COUNT] = {
 	"typedef",
@@ -12,30 +13,32 @@ const char *tokens_to_str[F_CTOKENS_COUNT] = {
 	"{", "}", ";", "\n", "\t", " ",
 };
 
-MRS_String *F_get_file_prefix(MRS_String *file_name)
+int F_get_file_prefix(MRS_String *file_name, MRS_String *dest)
 {
 	int file_prefix_len = 0;
 
 	char *file_prefix_delimiter =
 		MRS_strchr(file_name, FILE_PREFIX_DELIMITER);
 	if (file_prefix_delimiter == NULL) {
-		return NULL;
+		return -1;
 	}
 
 	file_prefix_len = file_prefix_delimiter - file_name->value;
 
 	if (file_prefix_len > MAX_FILE_PREFIX_LENGTH) {
-		return NULL;
+		return -1;
 	}
 
 	for (int i = 0; i < file_prefix_len; i++) {
 		if (!isalpha(file_name->value[i]) ||
 		    isupper(file_name->value[i])) {
-			return NULL;
+			dest = NULL;
+			return -1;
 		}
 	}
 
-	return MRS_strndup(file_name, file_prefix_len);
+	MRS_strndup(file_name, file_prefix_len, dest);
+	return 0;
 }
 
 MRS_String *F_get_file_contents(const char *file_name)
@@ -90,13 +93,14 @@ int F_keyword_validate_surrounding(MRS_String *file_contents,
 int F_get_next_keyword_idx(MRS_String *file_contents, size_t start_position,
 			   F_CKeywords keyword, size_t *found_position)
 {
-	MRS_String *keyword_str = MRS_init(0, keywords_to_str[keyword]);
+	MRS_String keyword_str;
+	MRS_init(0, keywords_to_str[keyword], &keyword_str);
 
 	while (start_position < file_contents->len) {
 		char *x =
-			MRS_strstr(file_contents, keyword_str, start_position);
+			MRS_strstr(file_contents, &keyword_str, start_position);
 		if (x == NULL) {
-			MRS_free(keyword_str);
+			MRS_free(&keyword_str);
 			return -1;
 		}
 
@@ -106,22 +110,22 @@ int F_get_next_keyword_idx(MRS_String *file_contents, size_t start_position,
 			continue;
 		}
 
-		MRS_free(keyword_str);
+		MRS_free(&keyword_str);
 		return MRS_get_idx(file_contents, x, found_position);
 	}
 
-	MRS_free(keyword_str);
+	MRS_free(&keyword_str);
 	return -1;
 }
 
 MRS_String *F_get_struct_name(MRS_String *file_contents,
 			      size_t struct_start_position)
 {
-	MRS_String *open_curly =
-		MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY]);
+	MRS_String open_curly;
+	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY], &open_curly);
 
 	char *next_open_curly_position =
-		MRS_strstr(file_contents, open_curly, struct_start_position);
+		MRS_strstr(file_contents, &open_curly, struct_start_position);
 
 	MRS_String *name = MRS_create(MAX_STRUCT_NAME_LENGTH);
 	const char *start_of_name =
@@ -132,10 +136,11 @@ MRS_String *F_get_struct_name(MRS_String *file_contents,
 
 	MRS_setstrn(name, start_of_name, name_length);
 	MRS_remove_whitespace(name);
-	MRS_free(open_curly);
+	MRS_free(&open_curly);
 
 	if (name->len == 0) {
 		MRS_free(name);
+		free(name);
 		return NULL;
 	}
 	return name;
@@ -144,14 +149,14 @@ MRS_String *F_get_struct_name(MRS_String *file_contents,
 MRS_String *F_get_struct_typedef_name(MRS_String *file_contents,
 				      size_t struct_start_position)
 {
-	MRS_String *open_curly =
-		MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY]);
+	MRS_String open_curly;
+	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY], &open_curly);
 
-	MRS_String *semi_colon =
-		MRS_init(0, tokens_to_str[F_CTOKENS_SEMI_COLON]);
+	MRS_String semi_colon;
+	MRS_init(0, tokens_to_str[F_CTOKENS_SEMI_COLON], &semi_colon);
 
 	char *struct_open_curly_ptr =
-		MRS_strstr(file_contents, open_curly, struct_start_position);
+		MRS_strstr(file_contents, &open_curly, struct_start_position);
 
 	size_t search_position =
 		struct_open_curly_ptr - file_contents->value + 1;
@@ -171,7 +176,7 @@ MRS_String *F_get_struct_typedef_name(MRS_String *file_contents,
 			}
 		}
 	}
-	char *struct_semi_colon_ptr = MRS_strstr(file_contents, semi_colon,
+	char *struct_semi_colon_ptr = MRS_strstr(file_contents, &semi_colon,
 						 struct_end_bracket_position);
 
 	size_t struct_semi_colon_position = 0;
@@ -187,11 +192,12 @@ MRS_String *F_get_struct_typedef_name(MRS_String *file_contents,
 		    typedef_name_len);
 	MRS_remove_whitespace(name);
 
-	MRS_free(semi_colon);
-	MRS_free(open_curly);
+	MRS_free(&semi_colon);
+	MRS_free(&open_curly);
 
 	if (name->len == 0) {
 		MRS_free(name);
+		free(name);
 		return NULL;
 	}
 
@@ -201,12 +207,12 @@ MRS_String *F_get_struct_typedef_name(MRS_String *file_contents,
 void F_seek_to_end_of_struct(MRS_String *file_contents,
 			     size_t *current_position)
 {
-	MRS_String *open_curly =
-		MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY]);
+	MRS_String open_curly;
+	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY], &open_curly);
 
 	char *struct_open_curly_ptr =
-		MRS_strstr(file_contents, open_curly, *current_position);
-	MRS_free(open_curly);
+		MRS_strstr(file_contents, &open_curly, *current_position);
+	MRS_free(&open_curly);
 
 	size_t open_curly_position = 0;
 	MRS_get_idx(file_contents, struct_open_curly_ptr, &open_curly_position);

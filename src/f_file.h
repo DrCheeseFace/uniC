@@ -29,13 +29,9 @@ typedef enum {
 } F_CTokens;
 
 /*
- * `returns` NULL if prefix length found is larger than `MAX_FILE_PREFIX_LENGTH`
- * `returns` NULL if prefix contains `non-alpha`
- * `returns` NULL if prefix contains `uppercase`
- *
- * `returns` NULL if not found 
+ * `returns` 0 if successful 
  */
-MRS_String *F_get_file_prefix(MRS_String *file_name);
+int F_get_file_prefix(MRS_String *file_name, MRS_String *dest);
 
 /*
  * dont forget to call free on the returned value

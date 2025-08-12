@@ -2,60 +2,64 @@
 #include "../lib/mr_utils/mrt_test.h"
 #include "../src/f_file.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int test_get_file_prefix(void)
 {
 	struct MRT_Context *t_ctx = MRT_ctx_create("test_get_file_prefix");
 
-	MRS_String *example_file_name = MRS_init(64, "r_renderer.c");
-	MRS_String *file_prefix = F_get_file_prefix(example_file_name);
-	MRS_String *expected_prefix = MRS_init(64, "r");
+	MRS_String example_file_name;
+	MRS_init(64, "r_renderer.c", &example_file_name);
+	MRS_String file_prefix;
+	int actual_result = F_get_file_prefix(&example_file_name, &file_prefix);
+	MRS_String expected_prefix;
+	MRS_init(64, "r", &expected_prefix);
 
 	struct MRT_Case test_case = { .description = "r_renderer.c string",
-				      .pass = !MRS_strcmp(expected_prefix,
-							  file_prefix) };
+				      .pass = !MRS_strcmp(&expected_prefix,
+							  &file_prefix) };
 	MRT_ctx_append_case(t_ctx, test_case);
-	MRS_free(file_prefix);
+	MRS_free(&file_prefix);
 
-	MRS_setstr(example_file_name, "renderer.c");
-	file_prefix = F_get_file_prefix(example_file_name);
+	MRS_setstr(&example_file_name, "renderer.c");
+	actual_result = F_get_file_prefix(&example_file_name, &file_prefix);
 	test_case = (struct MRT_Case){
 		.description = "renderer.c string",
-		.pass = file_prefix == NULL,
+		.pass = actual_result == -1,
 
 	};
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(example_file_name, "abcde_renderer.c");
-	file_prefix = F_get_file_prefix(example_file_name);
-	MRS_setstr(expected_prefix, "abcde");
+	MRS_setstr(&example_file_name, "abcde_renderer.c");
+	actual_result = F_get_file_prefix(&example_file_name, &file_prefix);
+	MRS_setstr(&expected_prefix, "abcde");
 	test_case = (struct MRT_Case){ .description = "abcde_renderer.c string",
-				       .pass = !MRS_strcmp(expected_prefix,
-							   file_prefix) };
+				       .pass = !MRS_strcmp(&expected_prefix,
+							   &file_prefix) };
 	MRT_ctx_append_case(t_ctx, test_case);
-	MRS_free(file_prefix);
+	MRS_free(&file_prefix);
 
-	MRS_setstr(example_file_name, "abcdef_renderer.c");
-	file_prefix = F_get_file_prefix(example_file_name);
+	MRS_setstr(&example_file_name, "abcdef_renderer.c");
+	actual_result = F_get_file_prefix(&example_file_name, &file_prefix);
 	test_case =
 		(struct MRT_Case){ .description = "abcdef_renderer.c string",
-				   .pass = file_prefix == NULL };
+				   .pass = actual_result == -1 };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(example_file_name, "ac1d_renderer.c");
-	file_prefix = F_get_file_prefix(example_file_name);
+	MRS_setstr(&example_file_name, "ac1d_renderer.c");
+	actual_result = F_get_file_prefix(&example_file_name, &file_prefix);
 	test_case = (struct MRT_Case){ .description = "ac1d_renderer.c string",
-				       .pass = file_prefix == NULL };
+				       .pass = actual_result == -1 };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(example_file_name, "1_renderer.c");
-	file_prefix = F_get_file_prefix(example_file_name);
+	MRS_setstr(&example_file_name, "1_renderer.c");
+	actual_result = F_get_file_prefix(&example_file_name, &file_prefix);
 	test_case = (struct MRT_Case){ .description = "1_renderer.c string",
-				       .pass = file_prefix == NULL };
+				       .pass = actual_result == -1 };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_free(example_file_name);
-	MRS_free(expected_prefix);
+	MRS_free(&example_file_name);
+	MRS_free(&expected_prefix);
 
 	int failed = MRT_ctx_log(t_ctx);
 	MRT_ctx_free(t_ctx);
@@ -70,15 +74,17 @@ int test_get_file_contents(void)
 		F_get_file_contents("test/testdata/getfilecontent.c");
 
 	const char *expected_str = "int main(void)\n{\n\treturn 0;\n}\n";
-	MRS_String *expected = MRS_init(0, expected_str);
+	MRS_String expected;
+	MRS_init(0, expected_str, &expected);
 
 	struct MRT_Case test_case =
 		(struct MRT_Case){ .description = "getfilecontents basic",
-				   .pass = !MRS_strcmp(expected, actual) };
+				   .pass = !MRS_strcmp(&expected, actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
 	MRS_free(actual);
-	MRS_free(expected);
+	free(actual);
+	MRS_free(&expected);
 
 	int failed = MRT_ctx_log(t_ctx);
 	MRT_ctx_free(t_ctx);
@@ -114,6 +120,7 @@ int test_get_structs(void)
 	F_get_structs(file_contents, struct_names, &struct_names_len);
 
 	MRS_free(file_contents);
+	free(file_contents);
 
 	struct MRT_Case test_case = (struct MRT_Case){
 		.description = "struct names count",
@@ -132,8 +139,10 @@ int test_get_structs(void)
 
 		MRT_ctx_append_case(t_ctx, test_case);
 		MRS_free(struct_names[i]);
+		free(struct_names[i]);
 	}
 	MRS_free(expected_struct_name);
+	free(expected_struct_name);
 
 	int failed = MRT_ctx_log(t_ctx);
 	MRT_ctx_free(t_ctx);
