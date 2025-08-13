@@ -1,6 +1,7 @@
 #include "../lib/mr_utils/mrs_strings.h"
 #include "../lib/mr_utils/mrt_test.h"
 #include "../src/f_file.h"
+#include "../src/s_struct.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -97,57 +98,93 @@ int test_get_file_contents(void)
 
 int test_get_structs(void)
 {
-	size_t expected_struct_names_count = 10;
-	const char *expected_struct_names[10] = {
-		"MyStruct",
+	size_t expected_struct_count = 8;
+	const char *expected_struct_names[8] = {
+		"MyStruct",	 NULL,	     "mystruct",    NULL,
+		"AnotherStruct", "TES_Case", "TES_Context", "G_GameState",
+	};
+
+	const char *expected_struct_typedef_names[8] = {
+		NULL,
 		"MyTypedefStruct",
-		"mystruct",
 		"mystructtypedefname",
 		"nogapstruct",
-		"AnotherStruct",
 		"AnotherTypedefStruct",
-		"TES_Case",
-		"TES_Context",
-		"G_GameState",
+		NULL,
+		NULL,
+		NULL,
 	};
+
 	MRS_String *expected_struct_name = MRS_create(64);
 
 	struct MRT_Context *t_ctx =
 		MRT_ctx_create("test_get_structs -> testdata/getstructs.h");
 
+	MRS_String filename;
+	MRS_init(16, "getstructs.h", strlen("getstructs.h"), &filename);
 	MRS_String *file_contents =
 		F_get_file_contents("test/testdata/getstructs.h");
 
-	MRS_String *struct_names[MAX_STRUCT_NAME_COUNT];
+	struct S_StructInfo structs_info[MAX_STRUCT_NAME_COUNT];
 	size_t struct_names_len;
 
-	F_get_structs(file_contents, struct_names, &struct_names_len);
+	S_get_structs(file_contents, &filename, structs_info,
+		      &struct_names_len);
 
 	MRS_free(file_contents);
 	free(file_contents);
 
-	struct MRT_Case test_case = (struct MRT_Case){
-		.description = "struct names count",
-		.pass = MRT_ASSERT_EQ(expected_struct_names_count,
-				      struct_names_len)
-	};
+	struct MRT_Case test_case =
+		(struct MRT_Case){ .description = "struct names count",
+				   .pass = MRT_ASSERT_EQ(expected_struct_count,
+							 struct_names_len) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
 	for (size_t i = 0; i < struct_names_len; i++) {
-		MRS_setstr(expected_struct_name, expected_struct_names[i],
-			   strlen(expected_struct_names[i]));
-		snprintf(test_case.description, sizeof(test_case.description),
-			 "checking for expected struct %s",
-			 expected_struct_names[i]);
-		test_case.pass =
-			!MRS_strcmp(struct_names[i], expected_struct_name);
-
+		if (expected_struct_names[i] != NULL) {
+			MRS_setstr(expected_struct_name,
+				   expected_struct_names[i],
+				   strlen(expected_struct_names[i]));
+			snprintf(test_case.description,
+				 sizeof(test_case.description),
+				 "checking for expected struct name '%s'",
+				 expected_struct_names[i]);
+			test_case.pass = !MRS_strcmp(structs_info[i].name,
+						     expected_struct_name);
+		} else {
+			snprintf(test_case.description,
+				 sizeof(test_case.description),
+				 "checking for NULL struct name");
+			test_case.pass = structs_info[i].name == NULL;
+		}
 		MRT_ctx_append_case(t_ctx, test_case);
-		MRS_free(struct_names[i]);
-		free(struct_names[i]);
+
+		if (expected_struct_typedef_names[i] != NULL) {
+			MRS_setstr(expected_struct_name,
+				   expected_struct_typedef_names[i],
+				   strlen(expected_struct_typedef_names[i]));
+			snprintf(
+				test_case.description,
+				sizeof(test_case.description),
+				"checking for expected struct typedef name '%s'",
+				expected_struct_typedef_names[i]);
+			test_case.pass =
+				!MRS_strcmp(structs_info[i].typedef_name,
+					    expected_struct_name);
+		} else {
+			snprintf(test_case.description,
+				 sizeof(test_case.description),
+				 "checking for NULL struct typedef name");
+			test_case.pass = structs_info[i].typedef_name == NULL;
+		}
+		MRT_ctx_append_case(t_ctx, test_case);
+
+		S_destroy_struct_info(&structs_info[i]);
 	}
+
 	MRS_free(expected_struct_name);
 	free(expected_struct_name);
+	MRS_free(&filename);
 
 	int failed = MRT_ctx_log(t_ctx);
 	MRT_ctx_free(t_ctx);

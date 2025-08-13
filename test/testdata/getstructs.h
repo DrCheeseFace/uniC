@@ -1,20 +1,25 @@
 // DO NOT REFORMAT THIS FILE
 
 struct MyStruct { /* ... */
+int window_w;
 };
 typedef struct { /* ... */
+int window_w;
 } MyTypedefStruct;
 
 struct mystruct {
+int window_w;
 } mystructtypedefname;
 
 typedef struct{ // no gap
+                int window_w;
 } nogapstruct;
 
 typedef struct AnotherStruct { /* ... */
+int window_w;
 } AnotherTypedefStruct;
 
-struct TES_Case {};
+struct TES_Case {int window_w;};
 
 struct TES_Context {
 	int pass_count;
@@ -39,3 +44,6 @@ struct G_GameState {
 	} conditions;
 	int selector_idx;
 };
+
+struct G_GameState bruh = { 0 }; // should not get picked up
+struct G_GameState bruh; // should not get picked up
