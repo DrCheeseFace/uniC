@@ -25,7 +25,7 @@ struct S_StructInfo {
 	size_t line_number;
 };
 
-void S_destroy_struct_info(struct S_StructInfo *a);
+void S_struct_info_destroy(struct S_StructInfo *a);
 
 void S_get_structs(MRS_String *file_contents, MRS_String *filename,
 		   struct S_StructInfo structs_info[MAX_STRUCT_NAME_COUNT],

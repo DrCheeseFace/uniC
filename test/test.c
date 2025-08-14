@@ -179,7 +179,7 @@ int test_get_structs(void)
 		}
 		MRT_ctx_append_case(t_ctx, test_case);
 
-		S_destroy_struct_info(&structs_info[i]);
+		S_struct_info_destroy(&structs_info[i]);
 	}
 
 	MRS_free(expected_struct_name);

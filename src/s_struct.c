@@ -123,13 +123,13 @@ MRS_String *S_get_struct_typedef_name(MRS_String *file_contents,
 	return name;
 }
 
-void S_destory_struct_variable(struct S_StructVariable *a)
+void S_struct_variables_destroy(struct S_StructVariable *a)
 {
 	MRS_free(a->name);
 	free(a->name);
 }
 
-void S_destroy_struct_info(struct S_StructInfo *a)
+void S_struct_info_destroy(struct S_StructInfo *a)
 {
 	if (a->name != NULL) {
 		MRS_free(a->name);
@@ -144,13 +144,14 @@ void S_destroy_struct_info(struct S_StructInfo *a)
 	free(a->filename);
 
 	for (size_t i = 0; i < a->variable_names_len; i++) {
-		S_destory_struct_variable(&a->variable_names[i]);
+		S_struct_variables_destroy(&a->variable_names[i]);
 	}
 }
 
-void S_append_struct_variable(MRS_String *file_contents,
-			      size_t variable_start_idx, size_t variable_len,
-			      struct S_StructInfo *dest)
+void S_struct_info_append_struct_variable(MRS_String *file_contents,
+					  size_t variable_start_idx,
+					  size_t variable_len,
+					  struct S_StructInfo *dest)
 {
 	MRS_String *variable_name = malloc(sizeof(*variable_name));
 	MRS_init(variable_len, &file_contents->value[variable_start_idx],
@@ -162,8 +163,9 @@ void S_append_struct_variable(MRS_String *file_contents,
 	dest->variable_names_len++;
 }
 
-void S_add_struct_variables(MRS_String *file_contents, size_t struct_idx,
-			    struct S_StructInfo *struct_info)
+void S_struct_info_add_struct_variables(MRS_String *file_contents,
+					size_t struct_idx,
+					struct S_StructInfo *struct_info)
 {
 	MRS_String open_curly;
 	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY],
@@ -216,7 +218,7 @@ void S_add_struct_variables(MRS_String *file_contents, size_t struct_idx,
 				}
 			}
 
-			S_append_struct_variable(
+			S_struct_info_append_struct_variable(
 				file_contents,
 				variable_name_end_idx - variable_name_len + 1,
 				variable_name_len, struct_info);
@@ -226,8 +228,8 @@ void S_add_struct_variables(MRS_String *file_contents, size_t struct_idx,
 	return;
 }
 
-void S_get_struct_info(MRS_String *file_contents, MRS_String *filename,
-		       size_t struct_idx, struct S_StructInfo *dest)
+void S_struct_info_init(MRS_String *file_contents, MRS_String *filename,
+			size_t struct_idx, struct S_StructInfo *dest)
 {
 	MRS_String *name = S_get_struct_name(file_contents, struct_idx);
 	MRS_String *typedef_name =
@@ -237,13 +239,12 @@ void S_get_struct_info(MRS_String *file_contents, MRS_String *filename,
 
 	dest->typedef_name = typedef_name;
 
-	dest->filename = MRS_create(filename->len);
-	MRS_setstrn(dest->filename, filename->value, filename->len,
-		    filename->len);
+	dest->filename = malloc(sizeof(*dest->filename));
+	MRS_init(filename->len, filename->value, filename->len, dest->filename);
 
 	dest->line_number = F_get_line_number(file_contents, struct_idx);
 
-	S_add_struct_variables(file_contents, struct_idx, dest);
+	S_struct_info_add_struct_variables(file_contents, struct_idx, dest);
 }
 
 void S_seek_to_end_of_struct(MRS_String *file_contents,
@@ -307,9 +308,9 @@ void S_get_structs(MRS_String *file_contents, MRS_String *filename,
 
 		if (S_check_struct_name_not_used_in_init(
 			    file_contents, character_position) == 0) {
-			S_get_struct_info(file_contents, filename,
-					  character_position,
-					  &structs_info[*structs_len]);
+			S_struct_info_init(file_contents, filename,
+					   character_position,
+					   &structs_info[*structs_len]);
 			*structs_len += 1;
 		}
 
