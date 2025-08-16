@@ -1,4 +1,6 @@
 #include "f_file.h"
+#include "../lib/mr_utils/mrs_misc.h"
+#include "s_struct.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,9 +12,8 @@ const char *keywords_to_str[F_CKEYWORDS_COUNT] = {
 	"enum",
 };
 
-const char *tokens_to_str[F_CTOKENS_COUNT] = {
-	"{", "}", ";", "=", "\n", "\t", " ",
-};
+const char *tokens_to_str[F_CTOKENS_COUNT] = { "{",  "}", ";", "=", "\n",
+					       "\t", " ", ",", "'" };
 
 const char valid_variable_name_chars[VALID_VARIABLE_NAME_CHARS_COUNT] = {
 	'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c',
@@ -68,9 +69,9 @@ MRS_String *F_get_file_contents(const char *file_name)
 }
 
 // returns 0 if valid surroundings
-int F_keyword_validate_surrounding(MRS_String *file_contents,
-				   char *struct_start_position,
-				   F_CKeywords keyword)
+internal int F_keyword_validate_surrounding(MRS_String *file_contents,
+					    char *struct_start_position,
+					    F_CKeywords keyword)
 {
 	// check character immediatly after struct for no-whitespace no-{
 	int after_idx = struct_start_position - file_contents->value +
@@ -150,4 +151,124 @@ size_t F_get_line_number(MRS_String *file_contents, size_t idx)
 	}
 
 	return line_count;
+}
+
+// TODO THARUN handle '}' being an enum value
+MRS_String *F_get_typedef_name(MRS_String *file_contents,
+			       size_t struct_start_position)
+{
+	MRS_String open_curly;
+	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY],
+		 strlen(tokens_to_str[F_CTOKENS_OPEN_CURLY]), &open_curly);
+
+	MRS_String semi_colon;
+	MRS_init(0, tokens_to_str[F_CTOKENS_SEMI_COLON],
+		 strlen(tokens_to_str[F_CTOKENS_SEMI_COLON]), &semi_colon);
+
+	char *struct_open_curly_ptr =
+		MRS_strstr(file_contents, &open_curly, struct_start_position);
+
+	size_t search_position =
+		struct_open_curly_ptr - file_contents->value + 1;
+
+	int bracket_stack = 1;
+	size_t struct_end_bracket_position = 0;
+	for (size_t i = search_position; i < file_contents->len; i++) {
+		char current_char = MRS_get_char(file_contents, i);
+		char next_char = MRS_get_char(file_contents, i + 1);
+		char prev_char = MRS_get_char(file_contents, i - 1);
+		if (current_char == *tokens_to_str[F_CTOKENS_OPEN_CURLY]) {
+			bracket_stack++;
+		} else if (current_char ==
+				   *tokens_to_str[F_CTOKENS_CLOSE_CURLY] &&
+			   !(next_char ==
+				     *tokens_to_str[F_CTOKENS_SINGLE_QUOTE] &&
+			     prev_char ==
+				     *tokens_to_str[F_CTOKENS_SINGLE_QUOTE])) {
+			bracket_stack--;
+			if (bracket_stack == 0) {
+				struct_end_bracket_position = i;
+				break;
+			}
+		}
+	}
+	char *struct_semi_colon_ptr = MRS_strstr(file_contents, &semi_colon,
+						 struct_end_bracket_position);
+
+	MRS_free(&semi_colon);
+	MRS_free(&open_curly);
+
+	size_t struct_semi_colon_position = 0;
+	MRS_get_idx(file_contents, struct_semi_colon_ptr,
+		    &struct_semi_colon_position);
+	size_t typedef_name_len =
+		struct_semi_colon_position - struct_end_bracket_position - 1;
+
+	MRS_String *name = MRS_create(MAX_STRUCT_NAME_LENGTH);
+
+	MRS_setstrn(name,
+		    &file_contents->value[struct_end_bracket_position + 1],
+		    file_contents->len, typedef_name_len);
+	MRS_remove_whitespace(name);
+
+	if (name->len == 0) {
+		MRS_free(name);
+		free(name);
+		return NULL;
+	}
+
+	MRS_shrink_to_fit(name);
+	return name;
+}
+
+MRS_String *F_get_name(MRS_String *file_contents, size_t struct_start_position,
+		       F_CKeywords keyword)
+{
+	MRS_String open_curly;
+	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY],
+		 strlen(tokens_to_str[F_CTOKENS_OPEN_CURLY]), &open_curly);
+
+	char *next_open_curly_position =
+		MRS_strstr(file_contents, &open_curly, struct_start_position);
+
+	MRS_free(&open_curly);
+
+	MRS_String *name = MRS_create(MAX_STRUCT_NAME_LENGTH);
+	char *start_of_name = &file_contents->value[struct_start_position] +
+			      strlen(keywords_to_str[keyword]);
+
+	size_t name_length = next_open_curly_position - start_of_name;
+
+	MRS_setstrn(name, start_of_name, name_length, name_length);
+	MRS_remove_whitespace(name);
+
+	if (name->len == 0) {
+		MRS_free(name);
+		free(name);
+		return NULL;
+	}
+
+	MRS_shrink_to_fit(name);
+	return name;
+}
+
+int F_check_name_not_used_in_init(MRS_String *file_contents,
+				  size_t struct_keyword_idx)
+{
+	int has_bracket = 0;
+	for (size_t i = struct_keyword_idx; i < file_contents->len; i++) {
+		if (file_contents->value[i] ==
+		    *tokens_to_str[F_CTOKENS_SEMI_COLON]) {
+			break;
+		}
+		if (file_contents->value[i] ==
+		    *tokens_to_str[F_CTOKENS_OPEN_CURLY]) {
+			has_bracket = 1;
+		}
+	}
+	if (!has_bracket) {
+		return 1;
+	}
+
+	return 0;
 }

@@ -31,98 +31,6 @@ int S_check_struct_name_not_used_in_init(MRS_String *file_contents,
 	return 0;
 }
 
-MRS_String *S_get_struct_name(MRS_String *file_contents,
-			      size_t struct_start_position)
-{
-	MRS_String open_curly;
-	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY],
-		 strlen(tokens_to_str[F_CTOKENS_OPEN_CURLY]), &open_curly);
-
-	char *next_open_curly_position =
-		MRS_strstr(file_contents, &open_curly, struct_start_position);
-
-	MRS_free(&open_curly);
-
-	MRS_String *name = MRS_create(MAX_STRUCT_NAME_LENGTH);
-	char *start_of_name = &file_contents->value[struct_start_position] +
-			      strlen(keywords_to_str[F_CKEYWORDS_STRUCT]);
-
-	size_t name_length = next_open_curly_position - start_of_name;
-
-	MRS_setstrn(name, start_of_name, name_length, name_length);
-	MRS_remove_whitespace(name);
-
-	if (name->len == 0) {
-		MRS_free(name);
-		free(name);
-		return NULL;
-	}
-
-	MRS_shrink_to_fit(name);
-	return name;
-}
-
-MRS_String *S_get_struct_typedef_name(MRS_String *file_contents,
-				      size_t struct_start_position)
-{
-	MRS_String open_curly;
-	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY],
-		 strlen(tokens_to_str[F_CTOKENS_OPEN_CURLY]), &open_curly);
-
-	MRS_String semi_colon;
-	MRS_init(0, tokens_to_str[F_CTOKENS_SEMI_COLON],
-		 strlen(tokens_to_str[F_CTOKENS_SEMI_COLON]), &semi_colon);
-
-	char *struct_open_curly_ptr =
-		MRS_strstr(file_contents, &open_curly, struct_start_position);
-
-	size_t search_position =
-		struct_open_curly_ptr - file_contents->value + 1;
-
-	int bracket_stack = 1;
-	size_t struct_end_bracket_position = 0;
-	for (size_t i = search_position; i < file_contents->len; i++) {
-		char current_char = MRS_get_char(file_contents, i);
-		if (current_char == *tokens_to_str[F_CTOKENS_OPEN_CURLY]) {
-			bracket_stack++;
-		} else if (current_char ==
-			   *tokens_to_str[F_CTOKENS_CLOSE_CURLY]) {
-			bracket_stack--;
-			if (bracket_stack == 0) {
-				struct_end_bracket_position = i;
-				break;
-			}
-		}
-	}
-	char *struct_semi_colon_ptr = MRS_strstr(file_contents, &semi_colon,
-						 struct_end_bracket_position);
-
-	MRS_free(&semi_colon);
-	MRS_free(&open_curly);
-
-	size_t struct_semi_colon_position = 0;
-	MRS_get_idx(file_contents, struct_semi_colon_ptr,
-		    &struct_semi_colon_position);
-	size_t typedef_name_len =
-		struct_semi_colon_position - struct_end_bracket_position - 1;
-
-	MRS_String *name = MRS_create(MAX_STRUCT_NAME_LENGTH);
-
-	MRS_setstrn(name,
-		    &file_contents->value[struct_end_bracket_position + 1],
-		    file_contents->len, typedef_name_len);
-	MRS_remove_whitespace(name);
-
-	if (name->len == 0) {
-		MRS_free(name);
-		free(name);
-		return NULL;
-	}
-
-	MRS_shrink_to_fit(name);
-	return name;
-}
-
 void S_struct_variables_destroy(struct S_StructVariable *a)
 {
 	MRS_free(a->name);
@@ -168,8 +76,7 @@ void S_struct_info_add_struct_variables(MRS_String *file_contents,
 					struct S_StructInfo *struct_info)
 {
 	MRS_String open_curly;
-	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY],
-		 strlen(tokens_to_str[F_CTOKENS_OPEN_CURLY]), &open_curly);
+	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY], 1, &open_curly);
 
 	char *open_curly_position =
 		MRS_strstr(file_contents, &open_curly, struct_idx);
@@ -231,16 +138,17 @@ void S_struct_info_add_struct_variables(MRS_String *file_contents,
 void S_struct_info_init(MRS_String *file_contents, MRS_String *filename,
 			size_t struct_idx, struct S_StructInfo *dest)
 {
-	MRS_String *name = S_get_struct_name(file_contents, struct_idx);
+	MRS_String *name =
+		F_get_name(file_contents, struct_idx, F_CKEYWORDS_STRUCT);
 	MRS_String *typedef_name =
-		S_get_struct_typedef_name(file_contents, struct_idx);
+		F_get_typedef_name(file_contents, struct_idx);
 
 	dest->name = name;
 
 	dest->typedef_name = typedef_name;
 
 	dest->filename = malloc(sizeof(*dest->filename));
-	MRS_init(filename->len, filename->value, filename->len, dest->filename);
+	MRS_strndup(filename, filename->len, dest->filename);
 
 	dest->line_number = F_get_line_number(file_contents, struct_idx);
 
@@ -262,8 +170,7 @@ void S_seek_to_end_of_struct(MRS_String *file_contents,
 	}
 
 	MRS_String open_curly;
-	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY],
-		 strlen(tokens_to_str[F_CTOKENS_OPEN_CURLY]), &open_curly);
+	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY], 1, &open_curly);
 
 	char *struct_open_curly_ptr =
 		MRS_strstr(file_contents, &open_curly, *current_position);

@@ -24,6 +24,8 @@ typedef enum {
 	F_CTOKENS_NEWLINE,
 	F_CTOKENS_TAB,
 	F_CTOKENS_SPACE,
+	F_CTOKENS_COMMA,
+	F_CTOKENS_SINGLE_QUOTE,
 	F_CTOKENS_COUNT,
 } F_CTokens;
 
@@ -53,5 +55,20 @@ int F_get_next_keyword_idx(MRS_String *file_contents, size_t start_position,
 int F_is_valid_variable_char(char c);
 
 size_t F_get_line_number(MRS_String *file_contents, size_t idx);
+
+/* 
+ * `struct` and `enum` specific functions
+ */
+
+MRS_String *F_get_typedef_name(MRS_String *file_contents,
+			       size_t struct_enum_position);
+
+MRS_String *F_get_name(MRS_String *file_contents, size_t struct_enum_position,
+		       F_CKeywords keyword);
+
+int F_check_name_not_used_in_init(MRS_String *file_contents,
+				  size_t struct_keyword_idx);
+
+// ---------------------------------------------------------------------------
 
 #endif // !F_FILE_H
