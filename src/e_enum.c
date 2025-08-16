@@ -19,7 +19,6 @@ void E_enum_info_destroy(struct E_EnumInfo *enum_info)
 	}
 }
 
-// TODO THARUN handle '}' being an enum value. freaks...
 internal void E_seek_to_end_of_enum(MRS_String *file_contents,
 				    size_t *enum_position)
 {
@@ -68,7 +67,6 @@ internal void E_enum_info_add_enum_values(MRS_String *file_contents,
 	MRS_init(0, tokens_to_str[F_CTOKENS_OPEN_CURLY], 1, &open_curly_mrs);
 	char *open_curly = MRS_strstr(file_contents, &open_curly_mrs, enum_idx);
 
-	// TODO THARUN handle '}' being a value of an enum
 	MRS_String close_curly_mrs;
 	MRS_init(0, tokens_to_str[F_CTOKENS_CLOSE_CURLY], 1, &close_curly_mrs);
 	char *close_curly =

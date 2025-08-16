@@ -194,6 +194,9 @@ int test_get_structs(void)
 
 int test_get_enums(void)
 {
+	struct MRT_Context *t_ctx =
+		MRT_ctx_create("test_get_enums -> getenums.h");
+
 	size_t expected_enums_count = 7;
 	const char *expected_enum_names[7] = {
 		"longenum",    "multilineenum", "MyEnum", NULL,
@@ -226,9 +229,6 @@ int test_get_enums(void)
 	};
 	MRS_String *expected_name = MRS_create(64);
 	MRS_String *expected_enum_name = MRS_create(64);
-
-	struct MRT_Context *t_ctx =
-		MRT_ctx_create("test_get_enums -> getenums.h");
 
 	MRS_String *file_contents =
 		F_get_file_contents("test/testdata/getenums.h");

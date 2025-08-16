@@ -153,7 +153,6 @@ size_t F_get_line_number(MRS_String *file_contents, size_t idx)
 	return line_count;
 }
 
-// TODO THARUN handle '}' being an enum value
 MRS_String *F_get_typedef_name(MRS_String *file_contents,
 			       size_t struct_start_position)
 {
