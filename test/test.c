@@ -5,6 +5,7 @@
 #include "../src/s_struct.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int test_get_file_prefix(void)
 {
@@ -119,6 +120,35 @@ int test_get_structs(void)
 		NULL,
 	};
 
+	size_t expected_struct_line_number[8] = { 3, 6, 10, 14, 18, 22, 24, 29 };
+
+	size_t expected_struct_variables_count[8] = { 1, 1, 1, 1, 1, 1, 2, 15 };
+
+	const char *expected_struct_variables[8][15] = {
+		{ "window_w" },
+		{ "window_w" },
+		{ "window_w" },
+		{ "window_w" },
+		{ "window_w" },
+		{ "window_w" },
+		{ "pass_count", "fail_count" },
+		{ "window_w", "window_h", "scale", "target_fps",
+		  "target_frametime_ms", "tsumo", "riichi", "double_riichi",
+		  "ippatsu", "haitei", "chankan", "rinshan", "tenhou",
+		  "conditions", "selector_idx" }
+	};
+
+	size_t expected_struct_variables_line_number[8][15] = {
+		{ 4 },
+		{ 7 },
+		{ 11 },
+		{ 15 },
+		{ 19 },
+		{ 22 },
+		{ 25, 26 },
+		{ 30, 31, 32, 33, 34, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45 }
+	};
+
 	MRS_String *expected_struct_name = MRS_create(64);
 
 	MRS_String filename;
@@ -142,6 +172,14 @@ int test_get_structs(void)
 	MRT_ctx_append_case(t_ctx, test_case);
 
 	for (size_t i = 0; i < struct_names_len; i++) {
+		snprintf(test_case.description, sizeof(test_case.description),
+			 "checking for struct '%s' correct line number %zu",
+			 expected_struct_names[i],
+			 expected_struct_line_number[i]);
+		test_case.pass = structs_info[i].line_number ==
+				 expected_struct_line_number[i];
+		MRT_ctx_append_case(t_ctx, test_case);
+
 		if (expected_struct_names[i] != NULL) {
 			MRS_setstr(expected_struct_name,
 				   expected_struct_names[i],
@@ -179,6 +217,37 @@ int test_get_structs(void)
 			test_case.pass = structs_info[i].typedef_name == NULL;
 		}
 		MRT_ctx_append_case(t_ctx, test_case);
+
+		snprintf(test_case.description, sizeof(test_case.description),
+			 "checking for expected struct variable count %zu",
+			 expected_struct_variables_count[i]);
+		test_case.pass = structs_info[i].variable_names_len ==
+				 expected_struct_variables_count[i];
+		MRT_ctx_append_case(t_ctx, test_case);
+
+		for (size_t j = 0; j < expected_struct_variables_count[i];
+		     j++) {
+			snprintf(
+				test_case.description,
+				sizeof(test_case.description),
+				"checking for expected struct variable name %s",
+				expected_struct_variables[i][j]);
+			test_case.pass = !strcmp(
+				structs_info[i].variable_names[j].name->value,
+				expected_struct_variables[i][j]);
+			MRT_ctx_append_case(t_ctx, test_case);
+
+			snprintf(
+				test_case.description,
+				sizeof(test_case.description),
+				"checking for expected struct variable name %s line number %zu",
+				expected_struct_variables[i][j],
+				expected_struct_variables_line_number[i][j]);
+			test_case.pass =
+				structs_info[i].variable_names[j].line_number ==
+				expected_struct_variables_line_number[i][j];
+			MRT_ctx_append_case(t_ctx, test_case);
+		}
 
 		S_struct_info_destroy(&structs_info[i]);
 	}
