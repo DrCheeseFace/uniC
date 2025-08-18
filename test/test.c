@@ -173,7 +173,7 @@ int test_get_structs(void)
 
 	for (size_t i = 0; i < struct_names_len; i++) {
 		snprintf(test_case.description, sizeof(test_case.description),
-			 "checking for struct '%s' correct line number %zu",
+			 "struct '%s' correct line number %zu",
 			 expected_struct_names[i],
 			 expected_struct_line_number[i]);
 		test_case.pass = structs_info[i].line_number ==
@@ -186,14 +186,13 @@ int test_get_structs(void)
 				   strlen(expected_struct_names[i]));
 			snprintf(test_case.description,
 				 sizeof(test_case.description),
-				 "checking for expected struct name '%s'",
-				 expected_struct_names[i]);
+				 "struct name '%s'", expected_struct_names[i]);
 			test_case.pass = !MRS_strcmp(structs_info[i].name,
 						     expected_struct_name);
 		} else {
 			snprintf(test_case.description,
 				 sizeof(test_case.description),
-				 "checking for NULL struct name");
+				 "NULL struct name");
 			test_case.pass = structs_info[i].name == NULL;
 		}
 		MRT_ctx_append_case(t_ctx, test_case);
@@ -202,24 +201,23 @@ int test_get_structs(void)
 			MRS_setstr(expected_struct_name,
 				   expected_struct_typedef_names[i],
 				   strlen(expected_struct_typedef_names[i]));
-			snprintf(
-				test_case.description,
-				sizeof(test_case.description),
-				"checking for expected struct typedef name '%s'",
-				expected_struct_typedef_names[i]);
+			snprintf(test_case.description,
+				 sizeof(test_case.description),
+				 "struct typedef name '%s'",
+				 expected_struct_typedef_names[i]);
 			test_case.pass =
 				!MRS_strcmp(structs_info[i].typedef_name,
 					    expected_struct_name);
 		} else {
 			snprintf(test_case.description,
 				 sizeof(test_case.description),
-				 "checking for NULL struct typedef name");
+				 "NULL struct typedef name");
 			test_case.pass = structs_info[i].typedef_name == NULL;
 		}
 		MRT_ctx_append_case(t_ctx, test_case);
 
 		snprintf(test_case.description, sizeof(test_case.description),
-			 "checking for expected struct variable count %zu",
+			 "struct variable count %zu",
 			 expected_struct_variables_count[i]);
 		test_case.pass = structs_info[i].variable_names_len ==
 				 expected_struct_variables_count[i];
@@ -227,22 +225,20 @@ int test_get_structs(void)
 
 		for (size_t j = 0; j < expected_struct_variables_count[i];
 		     j++) {
-			snprintf(
-				test_case.description,
-				sizeof(test_case.description),
-				"checking for expected struct variable name %s",
-				expected_struct_variables[i][j]);
+			snprintf(test_case.description,
+				 sizeof(test_case.description),
+				 "struct variable name %s",
+				 expected_struct_variables[i][j]);
 			test_case.pass = !strcmp(
 				structs_info[i].variable_names[j].name->value,
 				expected_struct_variables[i][j]);
 			MRT_ctx_append_case(t_ctx, test_case);
 
-			snprintf(
-				test_case.description,
-				sizeof(test_case.description),
-				"checking for expected struct variable name %s line number %zu",
-				expected_struct_variables[i][j],
-				expected_struct_variables_line_number[i][j]);
+			snprintf(test_case.description,
+				 sizeof(test_case.description),
+				 "struct variable name %s line number %zu",
+				 expected_struct_variables[i][j],
+				 expected_struct_variables_line_number[i][j]);
 			test_case.pass =
 				structs_info[i].variable_names[j].line_number ==
 				expected_struct_variables_line_number[i][j];
@@ -311,10 +307,10 @@ int test_get_enums(void)
 
 	E_get_enums(file_contents, &filename, enums_info, &enum_names_len);
 
-	struct MRT_Case test_case = (struct MRT_Case){
-		.description = "checking number of enums found",
-		.pass = expected_enums_count == enum_names_len
-	};
+	struct MRT_Case test_case =
+		(struct MRT_Case){ .description = "number of enums found",
+				   .pass = expected_enums_count ==
+					   enum_names_len };
 
 	for (size_t i = 0; i < enum_names_len; i++) {
 		if (expected_enum_names[i] != NULL) {
@@ -322,14 +318,13 @@ int test_get_enums(void)
 				   strlen(expected_enum_names[i]));
 			snprintf(test_case.description,
 				 sizeof(test_case.description),
-				 "checking for expected enum name '%s'",
-				 expected_enum_names[i]);
+				 "enum name '%s'", expected_enum_names[i]);
 			test_case.pass = !MRS_strcmp(enums_info[i].name,
 						     expected_enum_name);
 		} else {
 			snprintf(test_case.description,
 				 sizeof(test_case.description),
-				 "checking for NULL enum name");
+				 "NULL enum name");
 			test_case.pass = enums_info[i].name == NULL;
 		}
 		MRT_ctx_append_case(t_ctx, test_case);
@@ -339,26 +334,26 @@ int test_get_enums(void)
 				   strlen(expected_enum_typedef_names[i]));
 			snprintf(test_case.description,
 				 sizeof(test_case.description),
-				 "checking for expected enum typedef name '%s'",
+				 "enum typedef name '%s'",
 				 expected_enum_typedef_names[i]);
 			test_case.pass = !MRS_strcmp(enums_info[i].typedef_name,
 						     expected_enum_name);
 		} else {
 			snprintf(test_case.description,
 				 sizeof(test_case.description),
-				 "checking for NULL enum typedef name");
+				 "NULL enum typedef name");
 			test_case.pass = enums_info[i].typedef_name == NULL;
 		}
 		MRT_ctx_append_case(t_ctx, test_case);
 
 		snprintf(test_case.description, sizeof(test_case.description),
-			 "checking for enum line number");
+			 "enum line number");
 		test_case.pass = enums_info[i].line_number ==
 				 expected_enum_line_number[i];
 		MRT_ctx_append_case(t_ctx, test_case);
 
 		snprintf(test_case.description, sizeof(test_case.description),
-			 "checking number of enum values for %s",
+			 "number of enum values for %s",
 			 expected_enum_names[i] ? expected_enum_names[i] :
 						  "typedef enum");
 		test_case.pass = enums_info[i].enum_values_len ==
@@ -370,7 +365,7 @@ int test_get_enums(void)
 				   strlen(expected_enum_values[i][j]));
 			snprintf(test_case.description,
 				 sizeof(test_case.description),
-				 "checking enum value %zu for %s: '%s'", j + 1,
+				 "enum value %zu for %s: '%s'", j + 1,
 				 expected_enum_names[i] ?
 					 expected_enum_names[i] :
 					 "typedef enum",
@@ -380,14 +375,13 @@ int test_get_enums(void)
 					    expected_name);
 			MRT_ctx_append_case(t_ctx, test_case);
 
-			snprintf(
-				test_case.description,
-				sizeof(test_case.description),
-				"checking line number for enum value '%s' in %s",
-				expected_enum_values[i][j],
-				expected_enum_names[i] ?
-					expected_enum_names[i] :
-					"typedef enum");
+			snprintf(test_case.description,
+				 sizeof(test_case.description),
+				 "line number for enum value '%s' in %s",
+				 expected_enum_values[i][j],
+				 expected_enum_names[i] ?
+					 expected_enum_names[i] :
+					 "typedef enum");
 			test_case.pass =
 				enums_info[i].enum_values[j].line_number ==
 				expected_enum_values_line_number[i][j];
