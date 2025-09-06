@@ -14,8 +14,7 @@ void E_enum_info_destroy(struct E_EnumInfo *enum_info)
 	free(enum_info->typedef_name);
 
 	for (size_t i = 0; i < enum_info->enum_values_len; i++) {
-		MRS_free(enum_info->enum_values[i].value);
-		free(enum_info->enum_values[i].value);
+		F_variable_destroy(&enum_info->enum_values[i]);
 	}
 }
 
@@ -43,7 +42,7 @@ internal void E_enum_values_init(MRS_String *file_contents,
 			MRS_String *enum_value = malloc(sizeof(*enum_value));
 			MRS_init(enum_variable_len, enum_value_start_position,
 				 enum_variable_len, enum_value);
-			dest->enum_values[dest->enum_values_len].value =
+			dest->enum_values[dest->enum_values_len].name =
 				enum_value;
 
 			size_t idx;

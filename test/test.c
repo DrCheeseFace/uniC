@@ -371,7 +371,7 @@ int test_get_enums(void)
 					 "typedef enum",
 				 expected_enum_values[i][j]);
 			test_case.pass =
-				!MRS_strcmp(enums_info[i].enum_values[j].value,
+				!MRS_strcmp(enums_info[i].enum_values[j].name,
 					    expected_name);
 			MRT_ctx_append_case(t_ctx, test_case);
 

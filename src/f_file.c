@@ -23,6 +23,12 @@ const char valid_variable_name_chars[VALID_VARIABLE_NAME_CHARS_COUNT] = {
 	'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_',
 };
 
+void F_variable_destroy(struct F_Variable *a)
+{
+	MRS_free(a->name);
+	free(a->name);
+}
+
 int F_get_file_prefix(MRS_String *file_name, MRS_String *dest)
 {
 	int file_prefix_len = 0;

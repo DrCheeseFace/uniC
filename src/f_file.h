@@ -29,11 +29,18 @@ typedef enum {
 	F_CTOKENS_COUNT,
 } F_CTokens;
 
+struct F_Variable {
+	MRS_String *name;
+	size_t line_number;
+};
+
 extern const char *keywords_to_str[F_CKEYWORDS_COUNT];
 
 extern const char *tokens_to_str[F_CTOKENS_COUNT];
 
 extern const char valid_variable_name_chars[VALID_VARIABLE_NAME_CHARS_COUNT];
+
+void F_variable_destroy(struct F_Variable *a);
 
 /*
  * `returns` 0 if successful 

@@ -31,12 +31,6 @@ int S_check_struct_name_not_used_in_init(MRS_String *file_contents,
 	return 0;
 }
 
-void S_struct_variables_destroy(struct S_StructVariable *a)
-{
-	MRS_free(a->name);
-	free(a->name);
-}
-
 void S_struct_info_destroy(struct S_StructInfo *a)
 {
 	if (a->name != NULL) {
@@ -52,7 +46,7 @@ void S_struct_info_destroy(struct S_StructInfo *a)
 	free(a->filename);
 
 	for (size_t i = 0; i < a->variable_names_len; i++) {
-		S_struct_variables_destroy(&a->variable_names[i]);
+		F_variable_destroy(&a->variable_names[i]);
 	}
 }
 
